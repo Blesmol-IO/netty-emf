@@ -1,0 +1,6 @@
+!/cache
+/cache/*
+!/cache/p2-Oxygen.3/
+/cache/p2-Oxygen.3/*
+# save the index to lessen recompute time
+!/cache/p2-Oxygen.3/index.xml.gz

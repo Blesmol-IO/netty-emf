@@ -1,0 +1,37 @@
+# Configure Repositories
+-plugin.1.Central = \
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.maven; \
+		name="Central"
+
+-plugin.2.Local: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Local; \
+		pretty = true; \
+		local = ${build}/local
+
+-plugin.3.Templates: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Templates; \
+		pretty = true; \
+		local = ${build}/templates
+
+-plugin.4.Release: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Release; \
+		pretty = true; \
+		local = ${build}/release
+
+# Point to a bundle pool
+-plugin.5.Oxygen.3: \
+	aQute.bnd.repository.p2.provider.P2Repository; \
+		name = Oxygen.3; \
+		url = http://download.eclipse.org/releases/oxygen/
+		#url = http://download.eclipse.org/eclipse/updates/4.7/R-4.7.3-201803010715/
+
+-releaserepo: Release
+-baselinerepo: Release
+
+# JUnit
+junit: org.apache.servicemix.bundles.junit; version=4.12

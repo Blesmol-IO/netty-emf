@@ -1,0 +1,40 @@
+# OSGi runtime
+org.osgi:osgi.annotation:6.0.1
+org.osgi:osgi.core:6.0.0
+org.osgi:osgi.cmpn:6.0.0
+org.apache.felix:org.apache.felix.scr:2.0.14
+org.apache.felix:org.apache.felix.metatype:1.1.6
+org.apache.felix:org.apache.felix.log:1.0.1
+org.apache.felix:org.apache.felix.gogo.shell:1.0.0
+org.apache.felix:org.apache.felix.gogo.runtime:1.0.10
+org.apache.felix:org.apache.felix.gogo.command:1.0.2
+org.apache.felix:org.apache.felix.framework:5.6.10
+org.apache.felix:org.apache.felix.eventadmin:1.4.10
+org.apache.felix:org.apache.felix.coordinator:1.0.2
+org.apache.felix:org.apache.felix.configadmin:1.8.16
+# Netty
+io.netty:netty-handler-proxy:jar:4.1.20.Final
+io.netty:netty-handler-proxy:jar:sources:4.1.20.Final
+io.netty:netty-codec-http:jar:4.1.20.Final
+#io.netty:netty-codec-http:jar:sources:4.1.20.Final
+io.netty:netty-handler:jar:4.1.20.Final
+io.netty:netty-common:jar:4.1.20.Final
+io.netty:netty-common:jar:sources:4.1.20.Final
+io.netty:netty-transport:jar:4.1.20.Final
+io.netty:netty-transport:jar:sources:4.1.20.Final
+io.netty:netty-resolver:jar:4.1.20.Final
+io.netty:netty-codec:jar:4.1.20.Final
+io.netty:netty-codec:jar:sources:4.1.20.Final
+io.netty:netty-buffer:jar:4.1.20.Final
+io.netty:netty-buffer:jar:sources:4.1.20.Final
+
+# Testing
+org.mockito:mockito-core:jar:2.13.0
+org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:4.12_1
+org.objenesis:objenesis:2.6
+net.bytebuddy:byte-buddy:jar:1.7.10
+net.bytebuddy:byte-buddy-agent:jar:1.7.10
+# Logging
+org.ops4j.pax.logging:pax-logging-api:jar:1.10.1
+org.ops4j.pax.logging:pax-logging-service:jar:1.10.1
+org.slf4j:slf4j-api:jar:1.7.25
