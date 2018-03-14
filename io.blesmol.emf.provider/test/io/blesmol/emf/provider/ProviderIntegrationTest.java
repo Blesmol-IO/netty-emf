@@ -1,9 +1,12 @@
 package io.blesmol.emf.provider;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,16 +21,18 @@ import org.eclipse.emf.ecore.resource.impl.BinaryResourceImpl;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
-public class ResourceSetProviderTest {
+public class ProviderIntegrationTest {
 
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
+	// TODO: break this out into different tests
 	@Test
-	public void shouldOpenBinaryResource() throws Exception {
+	public void shouldWork() throws Exception {
 
 		final ResourceSetProvider rs = new ResourceSetProvider();
 		final Map<String, Object> properties = new HashMap<>();
@@ -53,7 +58,6 @@ public class ResourceSetProviderTest {
 		resourceFactoryRegistry.setURIConverter(uriConverter);
 		rs.setResourceFactoryRegistry(resourceFactoryRegistry);
 
-
 		// Setup epackage registry provider with a dynamic package
 		final EcoreFactory ecoreFactory = EcoreFactory.eINSTANCE;
 		final EClass eClass = ecoreFactory.createEClass();
@@ -75,16 +79,39 @@ public class ResourceSetProviderTest {
 		final File file = new File(tempUri.toFileString());
 		assertEquals(0L, file.length());
 
-		Resource resource = rs.createResource(logicalUri);
+		ResourceProvider resourceProvider = new ResourceProvider();
+		LogService mockService = mock(LogService.class);
+		resourceProvider.logger = mockService;
+		resourceProvider.resourceSet = rs;
+
+		assertTrue(resourceProvider.delegate == null);
+		resourceProvider.activate(new EmfApi.Resource() {
+
+			@Override
+			public Class<? extends Annotation> annotationType() {
+				return EmfApi.Resource.class;
+			}
+
+			@Override
+			public String emf_uri() {
+				return logicalUri.toString();
+			}
+
+		});
+
+		assertNotNull(resourceProvider.delegate);
+
+		Resource resource = rs.getResource(logicalUri, false);
+		assertEquals(resourceProvider.delegate, resource);
+		
+		// 
 		EObject eObject = ePackage.getEFactoryInstance().create(eClass);
 		resource.getContents().add(eObject);
 		resource.save(null);
 		assertTrue(file.length() > 0);
 
 		// Recreate & verify
-		rs.getResources().clear();
-		resource = rs.getResource(logicalUri, true);
-		EObject other = resource.getContents().get(0);
+		EObject other = resourceProvider.getContents().get(0);
 		assertEquals(ePackage.getNsURI(), other.eClass().getEPackage().getNsURI());
 
 	}

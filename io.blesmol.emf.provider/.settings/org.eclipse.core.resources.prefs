@@ -1,4 +1,4 @@
 eclipse.preferences.version=1
-encoding//test/io/blesmol/emf/provider/ResourceSetProviderTest.java=UTF-8
+encoding//test/io/blesmol/emf/provider/ProviderIntegrationTest.java=UTF-8
 encoding/bnd.bnd=UTF-8
 encoding/launch.bndrun=UTF-8
