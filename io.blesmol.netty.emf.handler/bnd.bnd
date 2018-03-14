@@ -1,0 +1,22 @@
+-buildpath: \
+	osgi.annotation;version=6.0.1,\
+	osgi.core;version=6.0,\
+	osgi.cmpn;version=6.0,\
+	slf4j.api;version=1.7,\
+	org.eclipse.emf.common;version=2.13,\
+	org.eclipse.emf.ecore;version=2.13,\
+	io.netty.buffer;version=4.1,\
+	io.netty.codec;version=4.1,\
+	io.netty.common;version=4.1,\
+	io.netty.handler;version=4.1,\
+	io.netty.transport;version=4.1
+
+-testpath: \
+	${junit},\
+	slf4j.simple;version=1.7
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 0.0.0.${tstamp}
+Private-Package: io.blesmol.netty.emf.handler

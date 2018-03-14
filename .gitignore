@@ -2,4 +2,4 @@
 .gradle/
 /generated/
 .metadata
-/io.blesmol.netty*/
+/io.blesmol.netty.emf.model/

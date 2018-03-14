@@ -34,8 +34,7 @@ public class ResourceProvider implements Resource {
 
 	@Activate
 	void activate(EmfApi.Resource config) {
-		// run in activate thread to block calling service methods
-		// until the delegate is set :-/
+		// TODO: consider calling via an executor versus the activate thread
 		createOrGetResource(config.emf_uri());
 	}
 
@@ -67,7 +66,6 @@ public class ResourceProvider implements Resource {
 
 	@Override
 	public EList<Adapter> eAdapters() {
-
 		return delegate.eAdapters();
 	}
 
