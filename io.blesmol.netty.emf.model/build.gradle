@@ -1,0 +1,58 @@
+plugins {
+    id 'org.xtext.builder' version '1.0.21'
+    id 'java'
+}
+
+repositories {
+    jcenter()
+}
+
+ext.xtextVersion = "2.12.0"
+
+// https://blogs.itemis.com/en/using-xtext-with-xcore-and-gradle
+
+// Note: the maven artifacts for EMF are from 2015, 2016 :-/
+dependencies {
+    compile "org.eclipse.xtext:org.eclipse.xtext:${xtextVersion}"
+    compile "org.eclipse.xtext:org.eclipse.xtext.xbase:${xtextVersion}"
+    compile 'org.eclipse.emf:org.eclipse.emf.ecore.xcore.lib:+'
+    compile 'org.eclipse.emf:org.eclipse.emf.common:+'
+    compile 'org.eclipse.emf:org.eclipse.emf.ecore:+'
+
+    // See https://github.com/xtext/xtext-gradle-plugin/issues/25#issuecomment-149895989
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.ecore.xcore:+'
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.ecore.xcore.lib:+'
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.codegen:+'
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.codegen.ecore:+'
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.codegen.ecore.xtext:+'
+    xtextLanguages "org.eclipse.xtext:org.eclipse.xtext.ecore:${xtextVersion}"
+    xtextLanguages 'org.eclipse.jdt:org.eclipse.jdt.core:+'
+    xtextLanguages 'org.eclipse.emf:org.eclipse.emf.mwe2.runtime:+'
+}
+
+xtext {
+    version = "${xtextVersion}"
+    languages {
+        ecore {
+            setup = 'org.eclipse.xtext.ecore.EcoreSupport'
+        }
+        codegen {
+            setup = 'org.eclipse.emf.codegen.ecore.xtext.GenModelSupport'
+        }
+        xcore {
+            setup = 'org.eclipse.emf.ecore.xcore.XcoreStandaloneSetup'
+            generator.outlet.producesJava = true
+        }
+    }
+    sourceSets {
+        main {
+            //srcDir 'model'
+            // Move the generated Xcore output to the src directory
+            // Used in conjunction with the `@GenModel(modelDirectory=...)` property
+            output {
+              dir(xtext.languages.xcore.generator.outlet, 'src-gen')
+            }
+        }
+    }
+    
+}

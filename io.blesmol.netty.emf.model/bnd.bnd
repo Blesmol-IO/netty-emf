@@ -1,0 +1,36 @@
+-buildpath: \
+	osgi.annotation;version=6.0.1,\
+	osgi.core;version=6.0,\
+	osgi.cmpn;version=6.0,\
+	org.eclipse.emf.common;version=2.13,\
+	org.eclipse.emf.ecore;version=2.13,\
+	org.eclipse.emf.ecore.xcore.lib;version=1.1,\
+	org.eclipse.emf.ecore.xcore;version=1.5,\
+	org.eclipse.xtext.xbase.lib;version=2.12,\
+	org.eclipse.xtext.ecore;version=2.12,\
+	org.eclipse.xtext.xbase;version=2.12,\
+	org.eclipse.xtext;version=2.12,\
+	io.netty.buffer;version=4.1,\
+	io.netty.common;version=4.1,\
+	org.eclipse.jdt.core;version=3.13
+
+-testpath: \
+	${junit}
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 0.1.0.${tstamp}
+
+Export-Package: \
+	io.blesmol.netty.emf.model,\
+	io.blesmol.netty.emf.model.impl,\
+	io.blesmol.netty.emf.model.util
+
+Include-Resource: OSGI-OPT/model=model
+
+
+src: src,model,src-gen
+
+# The bsn needs to specify the singleton attribute
+#Bundle-SymbolicName: ${p};singleton:=true

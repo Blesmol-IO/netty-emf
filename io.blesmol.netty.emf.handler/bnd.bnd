@@ -9,7 +9,8 @@
 	io.netty.codec;version=4.1,\
 	io.netty.common;version=4.1,\
 	io.netty.handler;version=4.1,\
-	io.netty.transport;version=4.1
+	io.netty.transport;version=4.1,\
+	io.blesmol.netty.emf.model;version=latest
 
 -testpath: \
 	${junit},\
