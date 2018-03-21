@@ -1,4 +1,4 @@
-package io.blesmol.emf.cdo;
+package io.blesmol.emf.cdo.impl;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -17,6 +17,8 @@ import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import io.blesmol.emf.cdo.impl.CdoServerImpl;
 
 public class CdoServerITest {
 

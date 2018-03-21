@@ -52,4 +52,4 @@ javac.target: 1.8
 
 Bundle-Version: 0.1.0.${tstamp}
 
-Export-Package: io.blesmol.emf.cdo
+Export-Package: io.blesmol.emf.cdo.impl

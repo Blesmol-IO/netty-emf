@@ -14,9 +14,9 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import io.blesmol.emf.cdo.CdoServerImpl;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoServer;
+import io.blesmol.emf.cdo.impl.CdoServerImpl;
 
 @Component(configurationPid = CdoApi.CdoServer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoServer.class)
 public class CdoServerProvider extends CdoServerImpl {

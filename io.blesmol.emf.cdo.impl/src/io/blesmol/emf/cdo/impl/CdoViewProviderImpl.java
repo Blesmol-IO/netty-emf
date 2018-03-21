@@ -1,4 +1,4 @@
-package io.blesmol.emf.cdo;
+package io.blesmol.emf.cdo.impl;
 
 import org.eclipse.emf.cdo.net4j.CDONet4jSession;
 import org.eclipse.emf.cdo.net4j.CDONet4jSessionConfiguration;

@@ -1,4 +1,4 @@
-package io.blesmol.emf.cdo;
+package io.blesmol.emf.cdo.impl;
 
 import java.util.Map;
 

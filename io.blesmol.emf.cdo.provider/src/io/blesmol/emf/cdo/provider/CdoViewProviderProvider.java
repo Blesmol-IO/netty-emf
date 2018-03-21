@@ -7,9 +7,9 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 
-import io.blesmol.emf.cdo.CdoViewProviderImpl;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoViewProvider;
+import io.blesmol.emf.cdo.impl.CdoViewProviderImpl;
 
 @Component(configurationPid=CdoApi.CdoViewProvider.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service=CdoViewProvider.class)
 public class CdoViewProviderProvider extends CdoViewProviderImpl {

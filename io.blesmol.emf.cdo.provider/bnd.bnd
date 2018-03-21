@@ -9,14 +9,12 @@ mockito: org.mockito.mockito-core;version="[2.1,3)",\
   
 h2: org.h2;version="[1.4.196,1.5)"
 
-cdotest: io.blesmol.cdo.
-
 -buildpath: \
 	osgi.annotation;version=6.0.1,\
 	osgi.core;version=6.0,\
 	osgi.cmpn;version=6.0,\
-	io.blesmol.emf.cdo;version=latest,\
 	io.blesmol.emf.cdo.api;version=latest,\
+	io.blesmol.emf.cdo.impl;version=latest,\
 	org.eclipse.emf.cdo;version=4.6,\
 	org.eclipse.emf.cdo.server;version=4.6,\
 	org.eclipse.emf.cdo.server.db;version=4.5,\
@@ -47,12 +45,12 @@ cdotest: io.blesmol.cdo.
 javac.source: 1.8
 javac.target: 1.8
 
-Bundle-Version: 0.0.0.${tstamp}
+Bundle-Version: 0.1.0.${tstamp}
 Private-Package: io.blesmol.emf.cdo.provider
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.test)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.provider)',\
-	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo)',\
+	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.impl)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.api)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.provider)',\
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.gogo.command)(version>=1.0.2))',\
@@ -61,7 +59,7 @@ Private-Package: io.blesmol.emf.cdo.provider
 -runee: JavaSE-1.8
 -runbundles: \
 	io.blesmol.emf.api;version=snapshot,\
-	io.blesmol.emf.cdo;version=snapshot,\
+	io.blesmol.emf.cdo.impl;version=snapshot,\
 	io.blesmol.emf.cdo.provider;version=snapshot,\
 	io.blesmol.emf.cdo.test;version=snapshot,\
 	io.blesmol.emf.provider;version=snapshot,\
