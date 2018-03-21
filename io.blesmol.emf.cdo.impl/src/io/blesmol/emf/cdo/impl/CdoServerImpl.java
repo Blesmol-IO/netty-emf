@@ -33,18 +33,25 @@ public class CdoServerImpl implements CdoServer {
 
 	protected void activate(String repoName, boolean auditing, boolean branching, boolean withRanges,
 			Map<String, String> repoProps) {
+		assert dataSource != null;
+		assert dbAdapter != null;
+		assert container != null;
+		assert acceptor != null;
+
 		connectionProvider = dbAdapter.createConnectionProvider(dataSource);
 		mappingStrategy = CDODBUtil.createHorizontalMappingStrategy(auditing, branching, withRanges);
 		store = CDODBUtil.createStore(mappingStrategy, dbAdapter, connectionProvider);
-		// container = container();
+
 		repository = CDOServerUtil.createRepository(repoName, store, repoProps);
 		CDOServerUtil.addRepository(container, repository);
 	}
 
 	protected void deactivate() {
-		acceptor.close();
+		// Only deactivate what we create
+		// acceptor.close();
 		repository.deactivate();
-		container.deactivate();
+		// Container may be used by others
+		// container.deactivate();
 		LifecycleUtil.deactivate(store);
 	}
 
