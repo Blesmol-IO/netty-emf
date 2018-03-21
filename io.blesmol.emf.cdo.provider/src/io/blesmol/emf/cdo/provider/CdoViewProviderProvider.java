@@ -1,6 +1,9 @@
 package io.blesmol.emf.cdo.provider;
 
+import java.util.Map;
+
 import org.eclipse.net4j.connector.IConnector;
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -11,27 +14,36 @@ import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoViewProvider;
 import io.blesmol.emf.cdo.impl.CdoViewProviderImpl;
 
-@Component(configurationPid=CdoApi.CdoViewProvider.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service=CdoViewProvider.class)
+@Component(configurationPid = CdoApi.CdoViewProvider.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoViewProvider.class)
 public class CdoViewProviderProvider extends CdoViewProviderImpl {
 
-	@Reference(name=CdoApi.CdoViewProvider.Reference.CONNECTOR)
+	private String servicePid;
+
+	@Reference(name = CdoApi.CdoViewProvider.Reference.CONNECTOR)
 	void setConnector(IConnector connector) {
 		this.connector = connector;
 	}
+
 	void unsetConnecto(IConnector connector) {
 		this.connector = null;
 	}
-	
+
 	@Activate
-	void activate(CdoApi.CdoViewProvider config) {
-		this.setRegex(config.regex());
-		this.setPriority(config.priority());
+	void activate(CdoApi.CdoViewProvider config, Map<String, Object> properties) {
+		this.servicePid = (String) properties.getOrDefault(Constants.SERVICE_PID, super.toString());
+		this.setRegex(config.blesmol_cdoviewprovider_regex());
+		this.setPriority(config.blesmol_cdoviewprovider_priority());
 		super.activate();
 	}
-	
+
 	@Override
 	@Deactivate
 	protected void deactivate() {
 		super.deactivate();
+	}
+
+	@Override
+	public String toString() {
+		return servicePid;
 	}
 }

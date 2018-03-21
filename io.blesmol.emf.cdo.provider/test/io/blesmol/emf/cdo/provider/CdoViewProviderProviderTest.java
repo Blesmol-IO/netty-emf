@@ -1,12 +1,16 @@
 package io.blesmol.emf.cdo.provider;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.server.IRepository.Props;
@@ -19,6 +23,7 @@ import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.osgi.service.jdbc.DataSourceFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 
@@ -36,13 +41,18 @@ public class CdoViewProviderProviderTest {
 
 		// Mock server configs
 		CdoApi.CdoServer config = mock(CdoApi.CdoServer.class);
-		when(config.repoName()).thenReturn(repoName);
+		when(config.blesmol_cdoserver_reponame()).thenReturn(repoName);
 		Map<String, Object> props = new HashMap<>();
 		props.put(Props.OVERRIDE_UUID, repoName);
 
 		// Create server
 		CdoServerProvider serverProvider = new CdoServerProvider();
-		serverProvider.setDataSource(cdoTestUtils.dataSource(tempFile, repoName));
+
+		DataSourceFactory dsf = mock(DataSourceFactory.class);
+		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
+		when(dsf.createDataSource(any())).thenReturn(dataSource);
+
+		serverProvider.dataSourceFactory = dsf;
 		final IManagedContainer container = cdoTestUtils.serverContainer(true);
 		serverProvider.setContainer(container);
 		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
@@ -51,11 +61,12 @@ public class CdoViewProviderProviderTest {
 		
 		// Mock view config
 		CdoApi.CdoViewProvider viewConfig = mock(CdoApi.CdoViewProvider.class);
-		when(viewConfig.regex()).thenReturn("cdo:.*");
-		when(viewConfig.priority()).thenReturn(500);
+		when(viewConfig.blesmol_cdoviewprovider_regex()).thenReturn("cdo:.*");
+		when(viewConfig.blesmol_cdoviewprovider_priority()).thenReturn(500);
 		
 		CdoViewProviderProvider viewProvider = new CdoViewProviderProvider();
-		viewProvider.activate(viewConfig);
+		viewProvider.setConnector(cdoTestUtils.getJvmConnector(container, repoName));
+		viewProvider.activate(viewConfig, Collections.emptyMap());
 
 		final URI uri = URI.createURI("cdo://notused:1234/" + repoName);
 		final ResourceSet rs = new ResourceSetImpl();

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.KeyStore;
+import java.util.Collections;
 
 import org.eclipse.net4j.Net4jUtil;
 import org.eclipse.net4j.acceptor.IAcceptor;
@@ -34,9 +35,9 @@ public class DelegatedConnectorProviderTest {
 
 	private CdoApi.IConnector config(String type, String description) {
 		CdoApi.IConnector config = mock(CdoApi.IConnector.class);
-		when(config.type()).thenReturn(type);
-		when(config.description()).thenReturn(description);
-		when(config.productGroup()).thenReturn("org.eclipse.net4j.connectors");
+		when(config.emf_cdo_connector_type()).thenReturn(type);
+		when(config.emf_cdo_connector_description()).thenReturn(description);
+		when(config.emf_cdo_connector_productgroup()).thenReturn("org.eclipse.net4j.connectors");
 		return config;
 	}
 
@@ -59,7 +60,7 @@ public class DelegatedConnectorProviderTest {
 		container.activate(); // standalone
 
 		// A JVM acceptor needs to be created before a connector
-		IAcceptor acceptor = JVMUtil.getAcceptor(container, config.description());
+		IAcceptor acceptor = JVMUtil.getAcceptor(container, config.emf_cdo_connector_description());
 
 		// Net4jUtil.prepareContainer(container); // Register Net4j factories
 		// CDONet4jUtil.prepareContainer(container); // Register CDO client factories
@@ -68,7 +69,7 @@ public class DelegatedConnectorProviderTest {
 		connector.setContainer(container);
 
 		// Verify: throws exception if cannot get connector delegate
-		connector.activate(config);
+		connector.activate(config, Collections.emptyMap());
 		connector.deactivate();
 		LifecycleUtil.deactivate(acceptor);
 	}
@@ -86,13 +87,13 @@ public class DelegatedConnectorProviderTest {
 		container.activate(); // standalone
 
 		// An acceptor needs to be available since the connector attempts to connect
-		IAcceptor acceptor = TCPUtil.getAcceptor(container, config.description());
+		IAcceptor acceptor = TCPUtil.getAcceptor(container, config.emf_cdo_connector_description());
 
 		DelegatedConnectorProvider connector = new DelegatedConnectorProvider();
 		connector.setContainer(container);
 
 		// Verify: throws exception if cannot get connector delegate
-		connector.activate(config);
+		connector.activate(config, Collections.emptyMap());
 		connector.deactivate();
 		LifecycleUtil.deactivate(acceptor);
 	}
@@ -121,13 +122,13 @@ public class DelegatedConnectorProviderTest {
 		container.activate(); // standalone
 
 		// An acceptor needs to be available since the connector attempts to connect
-		IAcceptor acceptor = SSLUtil.getAcceptor(container, config.description());
+		IAcceptor acceptor = SSLUtil.getAcceptor(container, config.emf_cdo_connector_description());
 
 		DelegatedConnectorProvider connector = new DelegatedConnectorProvider();
 		connector.setContainer(container);
 
 		// Verify: throws exception if cannot get connector delegate
-		connector.activate(config);
+		connector.activate(config, Collections.emptyMap());
 		connector.deactivate();
 		LifecycleUtil.deactivate(acceptor);
 	}

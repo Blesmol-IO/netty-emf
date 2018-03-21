@@ -3,16 +3,16 @@ package io.blesmol.emf.cdo.provider;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.eclipse.net4j.acceptor.IAcceptor;
 import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.util.container.IManagedContainer;
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jdbc.DataSourceFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoServer;
@@ -21,14 +21,10 @@ import io.blesmol.emf.cdo.impl.CdoServerImpl;
 @Component(configurationPid = CdoApi.CdoServer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoServer.class)
 public class CdoServerProvider extends CdoServerImpl {
 
-	@Reference(name = CdoApi.CdoServer.Reference.DATA_SOURCE)
-	void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+	private String servicePid;
 
-	void unsetDataSource(DataSource dataSource) {
-		this.dataSource = null;
-	}
+	@Reference
+	DataSourceFactory dataSourceFactory;
 
 	@Reference(name = CdoApi.CdoServer.Reference.DB_ADAPTER)
 	void setDbAdapter(IDBAdapter dbAdapter) {
@@ -58,10 +54,13 @@ public class CdoServerProvider extends CdoServerImpl {
 	}
 
 	@Activate
-	void activate(CdoApi.CdoServer config, Map<String, Object> properties) {
+	void activate(CdoApi.CdoServer config, Map<String, Object> properties) throws Exception {
 		// TODO: Run on thread
+		this.servicePid = (String) properties.getOrDefault(Constants.SERVICE_PID, super.toString());
+		this.dataSource = dataSourceFactory.createDataSource(null);
 		final Map<String, String> repoProps = repoProperties(properties);
-		activate(config.repoName(), config.auditing(), config.branching(), config.withRanges(), repoProps);
+		activate(config.blesmol_cdoserver_reponame(), config.blesmol_cdoserver_auditing(),
+				config.blesmol_cdoserver_branching(), config.blesmol_cdoserver_withranges(), repoProps);
 	}
 
 	@Override
@@ -79,4 +78,10 @@ public class CdoServerProvider extends CdoServerImpl {
 				.forEach(es -> results.put(es.getKey(), (String) es.getValue()));
 		return results;
 	}
+
+	@Override
+	public String toString() {
+		return servicePid;
+	}
+
 }

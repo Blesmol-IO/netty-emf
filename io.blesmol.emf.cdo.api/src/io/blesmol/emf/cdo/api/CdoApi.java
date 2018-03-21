@@ -5,13 +5,13 @@ public interface CdoApi {
 	@interface CdoServer {
 		String PID = "io.blesmol.emf.cdo.api.CdoServer.pid";
 
-		String repoName();
+		String blesmol_cdoserver_reponame();
 
-		boolean auditing() default true;
+		boolean blesmol_cdoserver_auditing() default true;
 
-		boolean branching() default true;
+		boolean blesmol_cdoserver_branching() default true;
 
-		boolean withRanges() default false;
+		boolean blesmol_cdoserver_withranges() default false;
 
 		@interface Reference {
 			String DATA_SOURCE = "blesmol.emf.cdoserver.datasource";
@@ -24,12 +24,12 @@ public interface CdoApi {
 	@interface CdoViewProvider {
 		String PID = "io.blesmol.emf.cdo.api.CdoViewProvider.pid";
 
-		String regex() default "cdo:.*";
+		String blesmol_cdoviewprovider_regex() default "cdo:.*";
 
 		/**
 		 * @see org.eclipse.emf.cdo.view.CDOViewProvider.DEFAULT_PRIORITY
 		 */
-		int priority() default 500;
+		int blesmol_cdoviewprovider_priority() default 500;
 
 		@interface Reference {
 			String CONNECTOR = "emf.cdo.viewprovider.connector";
@@ -39,12 +39,12 @@ public interface CdoApi {
 	@interface IConnector {
 		String PID = "org.eclipse.net4j.connector.IConnector.pid";
 
-		String description();
+		String emf_cdo_connector_description();
 
-		String productGroup() default "org.eclipse.net4j.connectors";
+		String emf_cdo_connector_productgroup() default "org.eclipse.net4j.connectors";
 
 		// jvm, tcp, ssl
-		String type() default "jvm";
+		String emf_cdo_connector_type() default "jvm";
 
 		@interface Reference {
 			String MANAGED_CONTAINER = "emf.cdo.iconnector.managedcontainer";
@@ -55,19 +55,19 @@ public interface CdoApi {
 		String PID = "org.eclipse.net4j.util.container.IManagedContainer.pid";
 
 		// jvm, tcp, ssl
-		String type() default "jvm";
+		String emf_cdo_managedcontainer_type() default "jvm";
 	}
 
 	@interface IAcceptor {
 		String PID = "org.eclipse.net4j.acceptor.IAcceptor.pid";
 
-		String description();
+		String emf_cdo_acceptor_description();
 
 		// jvm, tcp, ssl
-		String type() default "jvm";
+		String emf_cdo_acceptor_type() default "jvm";
 
 		@interface Reference {
-			String MANAGED_CONTAINER = "emf.cdo.iacceptor.managedcontainer";
+			String MANAGED_CONTAINER = "emf.cdo.acceptor.managedcontainer";
 		}
 	}
 	

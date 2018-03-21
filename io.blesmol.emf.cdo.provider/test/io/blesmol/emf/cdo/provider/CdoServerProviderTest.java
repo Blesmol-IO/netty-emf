@@ -1,5 +1,6 @@
 package io.blesmol.emf.cdo.provider;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -7,13 +8,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.eclipse.emf.cdo.server.IRepository.Props;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.osgi.service.jdbc.DataSourceFactory;
 
-import io.blesmol.emf.cdo.provider.CdoTestUtils;
 import io.blesmol.emf.cdo.api.CdoApi;
 
 public class CdoServerProviderTest {
@@ -28,14 +31,18 @@ public class CdoServerProviderTest {
 		
 		String repoName = getClass().getSimpleName();
 		CdoApi.CdoServer config = mock(CdoApi.CdoServer.class);
-		when(config.repoName()).thenReturn(repoName);
+		when(config.blesmol_cdoserver_reponame()).thenReturn(repoName);
 
 		File tempFile = tempFolder.newFile(repoName);
 		Map<String, Object> props = new HashMap<>();
 		props.put(Props.OVERRIDE_UUID, repoName);
 
+		DataSourceFactory dsf = mock(DataSourceFactory.class);
+		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
+		when(dsf.createDataSource(any())).thenReturn(dataSource);
+
 		CdoServerProvider serverProvider = new CdoServerProvider();
-		serverProvider.setDataSource(cdoTestUtils.dataSource(tempFile, repoName));
+		serverProvider.dataSourceFactory = dsf;
 		final IManagedContainer container = cdoTestUtils.serverContainer(true);
 		serverProvider.setContainer(container);
 		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
