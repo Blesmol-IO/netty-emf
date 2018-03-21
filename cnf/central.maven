@@ -39,3 +39,6 @@ org.ops4j.pax.logging:pax-logging-api:jar:1.10.1
 org.ops4j.pax.logging:pax-logging-service:jar:1.10.1
 org.slf4j:slf4j-api:jar:1.7.25
 org.slf4j:slf4j-simple:jar:1.7.25
+com.h2database:h2:jar:1.4.196
+org.eclipselabs:net4j.h2.p2:jar:repackaged:4.6.2
+org.eclipselabs:net4j.jvm.p2:jar:repackaged:4.4.0
