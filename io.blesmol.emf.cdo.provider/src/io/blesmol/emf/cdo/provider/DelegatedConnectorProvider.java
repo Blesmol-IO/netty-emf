@@ -14,7 +14,7 @@ import org.osgi.service.component.annotations.Reference;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.impl.DelegatedConnector;
 
-@Component(configurationPid = CdoApi.IConnector.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IConnector.class)
+@Component(configurationPid = CdoApi.IConnector.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IConnector.class, immediate=true)
 public class DelegatedConnectorProvider extends DelegatedConnector {
 
 	private String servicePid;

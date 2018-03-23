@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.eclipse.net4j.acceptor.IAcceptor;
 import org.eclipse.net4j.db.IDBAdapter;
+import org.eclipse.net4j.db.IDBConnectionProvider;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
@@ -12,19 +13,15 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.jdbc.DataSourceFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoServer;
 import io.blesmol.emf.cdo.impl.CdoServerImpl;
 
-@Component(configurationPid = CdoApi.CdoServer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoServer.class)
+@Component(configurationPid = CdoApi.CdoServer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoServer.class, immediate=true)
 public class CdoServerProvider extends CdoServerImpl {
 
 	private String servicePid;
-
-	@Reference
-	DataSourceFactory dataSourceFactory;
 
 	@Reference(name = CdoApi.CdoServer.Reference.DB_ADAPTER)
 	void setDbAdapter(IDBAdapter dbAdapter) {
@@ -33,6 +30,15 @@ public class CdoServerProvider extends CdoServerImpl {
 
 	void unsetDbAdapter(IDBAdapter dbAdapter) {
 		this.dbAdapter = null;
+	}
+	
+	@Reference(name = CdoApi.CdoServer.Reference.DB_CONNECTION_PROVIDER)
+	void setDbConnectionProvider(IDBConnectionProvider dbConnectionProvider) {
+		this.connectionProvider = dbConnectionProvider;
+	}
+	
+	void unsetDbConnectionProvider(IDBConnectionProvider dbConnectionProvider) {
+		this.connectionProvider = null;
 	}
 
 	@Reference(name = CdoApi.CdoServer.Reference.MANAGED_CONTAINER)
@@ -57,7 +63,6 @@ public class CdoServerProvider extends CdoServerImpl {
 	void activate(CdoApi.CdoServer config, Map<String, Object> properties) throws Exception {
 		// TODO: Run on thread
 		this.servicePid = (String) properties.getOrDefault(Constants.SERVICE_PID, super.toString());
-		this.dataSource = dataSourceFactory.createDataSource(null);
 		final Map<String, String> repoProps = repoProperties(properties);
 		activate(config.blesmol_cdoserver_reponame(), config.blesmol_cdoserver_auditing(),
 				config.blesmol_cdoserver_branching(), config.blesmol_cdoserver_withranges(), repoProps);

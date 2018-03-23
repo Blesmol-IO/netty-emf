@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.eclipse.emf.cdo.server.IRepository.Props;
+import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,16 +38,16 @@ public class CdoServerProviderTest {
 		Map<String, Object> props = new HashMap<>();
 		props.put(Props.OVERRIDE_UUID, repoName);
 
-		DataSourceFactory dsf = mock(DataSourceFactory.class);
 		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
-		when(dsf.createDataSource(any())).thenReturn(dataSource);
-
+		IDBAdapter dbAdapter = cdoTestUtils.h2Adapter();
 		CdoServerProvider serverProvider = new CdoServerProvider();
-		serverProvider.dataSourceFactory = dsf;
-		final IManagedContainer container = cdoTestUtils.serverContainer(true);
+		final IManagedContainer container = cdoTestUtils.serverContainer(true);		
+		serverProvider.setDbConnectionProvider(dbAdapter.createConnectionProvider(dataSource));
 		serverProvider.setContainer(container);
 		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
-		serverProvider.setDbAdapter(cdoTestUtils.h2Adapter());
+		serverProvider.setDbAdapter(dbAdapter);
+		
+		// Verify
 		serverProvider.activate(config, props);
 		serverProvider.deactivate();
 	}

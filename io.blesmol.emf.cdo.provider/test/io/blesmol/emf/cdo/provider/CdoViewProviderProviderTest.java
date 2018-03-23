@@ -18,6 +18,7 @@ import org.eclipse.emf.cdo.transaction.CDOTransaction;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 import org.junit.Rule;
@@ -48,15 +49,14 @@ public class CdoViewProviderProviderTest {
 		// Create server
 		CdoServerProvider serverProvider = new CdoServerProvider();
 
-		DataSourceFactory dsf = mock(DataSourceFactory.class);
+		IDBAdapter dbAdapter = cdoTestUtils.h2Adapter();
 		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
-		when(dsf.createDataSource(any())).thenReturn(dataSource);
 
-		serverProvider.dataSourceFactory = dsf;
 		final IManagedContainer container = cdoTestUtils.serverContainer(true);
+		serverProvider.setDbConnectionProvider(dbAdapter.createConnectionProvider(dataSource));
 		serverProvider.setContainer(container);
 		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
-		serverProvider.setDbAdapter(cdoTestUtils.h2Adapter());
+		serverProvider.setDbAdapter(dbAdapter);
 		serverProvider.activate(config, props);
 		
 		// Mock view config

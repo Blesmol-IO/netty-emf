@@ -1,6 +1,7 @@
 package io.blesmol.emf.cdo.impl;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -54,13 +55,13 @@ public class CdoTestUtils {
 		return JVMUtil.getConnector(container, repoName);
 	}
 
-	public DataSource dataSource(File file, String repoName) {
+	public DataSource dataSource(File file, String repoName) throws Exception {
 		// Don't use memory since the schema is written and a new data source is made
-		final String dbUri = "jdbc:h2:" + file.getAbsolutePath();
+		final String dbUri = "jdbc:h2:" + file.toURI().toURL().toString(); //  getAbsolutePath();
 		JdbcDataSource dataSource = new JdbcDataSource();
 		dataSource.setUrl(dbUri);
 		H2Adapter.createSchema(dataSource, repoName, true);
-		dataSource = new JdbcDataSource();
+//		dataSource = new JdbcDataSource();
 		dataSource.setURL(dbUri + ";SCHEMA=" + repoName);
 		return dataSource;
 	}
@@ -70,12 +71,12 @@ public class CdoTestUtils {
 	}
 
 	public CdoServerImpl server(File tempFile, String repoName, boolean auditing, boolean branching, boolean withRanges,
-			Map<String, String> repoProps) {
+			Map<String, String> repoProps) throws Exception {
 		CdoServerImpl cdoServer = new CdoServerImpl();
-		cdoServer.dataSource = dataSource(tempFile, repoName);
+		cdoServer.dbAdapter = h2Adapter();
+		cdoServer.connectionProvider = cdoServer.dbAdapter.createConnectionProvider(dataSource(tempFile, repoName));
 		cdoServer.container = serverContainer(true);
 		cdoServer.acceptor = getJvmAcceptor(cdoServer.container, repoName);
-		cdoServer.dbAdapter = h2Adapter();
 
 		// XMI bundle needs to be on run path for internal CDO classes to work
 		// Adding a '*' to the global resource factory registry doesn't seem to work

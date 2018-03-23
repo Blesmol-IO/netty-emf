@@ -14,7 +14,8 @@ public interface CdoApi {
 		boolean blesmol_cdoserver_withranges() default false;
 
 		@interface Reference {
-			String DATA_SOURCE = "blesmol.emf.cdoserver.datasource";
+//			String DATA_SOURCE = "blesmol.emf.cdoserver.datasource";
+			String DB_CONNECTION_PROVIDER = "blesmol.emf.cdoserver.dbconnectionprovider"; 
 			String DB_ADAPTER = "blesmol.emf.cdoserver.dbadapter";
 			String MANAGED_CONTAINER = "blesmol.emf.cdoserver.managedcontainer";
 			String ACCEPTOR = "blesmol.emf.cdoserver.acceptor";
@@ -71,7 +72,20 @@ public interface CdoApi {
 		}
 	}
 	
-	@interface H2Adapter {
-		String PID = "org.eclipse.net4j.db.h2.H2Adapter.pid";
+	@interface IDBAdapter {
+		String PID = "org.eclipse.net4j.db.IDBAdapter.pid";
+	}
+	
+	@interface IDBConnectionProvider {
+		String PID = "org.eclipse.net4j.db.IDBConnectionProvider.pid";
+		
+		/**
+		 * Only file: URLs supported currently
+		 */
+		String emf_cdo_connectionprovider_url() default "";
+		
+		@interface Reference {
+			String DB_ADAPTER = "emf.cdo.connectionprovider.dbadapter";
+		}
 	}
 }

@@ -14,7 +14,7 @@ import org.osgi.service.component.annotations.Reference;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.impl.DelegatedAcceptor;
 
-@Component(configurationPid = CdoApi.IAcceptor.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IAcceptor.class)
+@Component(configurationPid = CdoApi.IAcceptor.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IAcceptor.class, immediate=true)
 public class DelegatedAcceptorProvider extends DelegatedAcceptor {
 
 	private String servicePid;

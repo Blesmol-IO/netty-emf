@@ -7,7 +7,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 
-@Component(configurationPid = CdoApi.H2Adapter.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IDBAdapter.class)
+@Component(configurationPid = CdoApi.IDBAdapter.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IDBAdapter.class, immediate=true)
 public class H2AdapterProvider extends H2Adapter {
 
 }
