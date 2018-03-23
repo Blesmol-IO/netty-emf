@@ -24,9 +24,6 @@ public class CdoResourceFactoryProviderTest extends AbstractTest {
 	public void after() {
 		super.after();
 	}
-	//
-	// @Rule
-	// public TemporaryFolder tempFolder = new TemporaryFolder();
 
 	private Configuration configure(Map<String, Object> properties) throws Exception {
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.Resource_Factory.PID, properties);
@@ -43,7 +40,7 @@ public class CdoResourceFactoryProviderTest extends AbstractTest {
 		Configuration resourceFactoryConfig = configure(properties);
 		String resourceFactoryFilter = String.format("(%s=%s)", Constants.SERVICE_PID, resourceFactoryConfig.getPid());
 		Factory.Registry resourceFactoryRegistry = serviceHelper.getService(context, Factory.Registry.class,
-				Optional.of(resourceFactoryFilter), 100);
+				Optional.of(resourceFactoryFilter), 1000);
 		assertNotNull(resourceFactoryRegistry);
 
 		Object cdoFactory = resourceFactoryRegistry.getProtocolToFactoryMap().get("cdo");
