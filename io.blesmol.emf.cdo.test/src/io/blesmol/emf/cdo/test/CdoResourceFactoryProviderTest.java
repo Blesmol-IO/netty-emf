@@ -25,19 +25,12 @@ public class CdoResourceFactoryProviderTest extends AbstractTest {
 		super.after();
 	}
 
-	private Configuration configure(Map<String, Object> properties) throws Exception {
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.Resource_Factory.PID, properties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.URIConverter.PID, properties);
-		return serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.Resource_Factory_Registry.PID,
-				properties);
-	}
-
 	@Test
 	public void cdoShouldBeRegisteredInEmfResourceFactoryRegistry() throws Exception {
 		Map<String, Object> properties = new HashMap<>();
 		properties.put(EmfApi.SCHEME, "cdo");
 
-		Configuration resourceFactoryConfig = configure(properties);
+		Configuration resourceFactoryConfig = configureForResourceFactory(properties);
 		String resourceFactoryFilter = String.format("(%s=%s)", Constants.SERVICE_PID, resourceFactoryConfig.getPid());
 		Factory.Registry resourceFactoryRegistry = serviceHelper.getService(context, Factory.Registry.class,
 				Optional.of(resourceFactoryFilter), 1000);

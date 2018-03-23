@@ -25,6 +25,7 @@ import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 
+import io.blesmol.emf.api.EmfApi;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoServer;
 import io.blesmol.emf.cdo.api.CdoViewProvider;
@@ -33,9 +34,9 @@ import io.blesmol.testutil.ServiceHelper;
 public abstract class AbstractTest {
 
 	protected static final String PROVIDER_BUNDLE = "io.blesmol.emf.cdo.provider";
-	
+
 	protected static final String VIEW_PROVIDER_TYPE = "io.blesmol.emf.cdo.provider.CdoViewProviderProvider";
-	
+
 	protected static final String CDO_SERVER_TYPE = "io.blesmol.emf.cdo.provider.CdoServerProvider";
 
 	/**
@@ -85,7 +86,14 @@ public abstract class AbstractTest {
 		return ksFile.toURI().toURL().toString();
 	}
 
-	
+	protected Configuration configureForResourceFactory(Map<String, Object> properties) throws Exception {
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.Resource_Factory.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.URIConverter.PID, properties);
+		return serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.Resource_Factory_Registry.PID,
+				properties);
+
+	}
+
 	protected void configureForServerOrClient(Map<String, Object> properties) throws Exception {
 		// Server & Client
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, properties);
@@ -93,14 +101,13 @@ public abstract class AbstractTest {
 				properties);
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID, properties);
 	}
-	
+
 	protected Configuration configureForServer(Map<String, Object> properties) throws Exception {
-		configureForServerOrClient(properties);		
+		configureForServerOrClient(properties);
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, properties);
-		return serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.CdoServer.PID, properties);
+		return serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.CdoServer.PID, properties);
 	}
-	
+
 	protected Configuration configureForViewProvider(Map<String, Object> properties) throws Exception {
 		configureForServer(properties);
 
@@ -137,9 +144,9 @@ public abstract class AbstractTest {
 		// a better synchronizer.
 		assertEquals(ComponentConfigurationDTO.ACTIVE, configurationDto.state);
 	}
-	
-	protected Map<String, Object> prep(TemporaryFolder tempFolder, CountDownLatch latch, String repoName, String description, String type,
-			boolean client, boolean ssl) throws Exception {
+
+	protected Map<String, Object> prep(TemporaryFolder tempFolder, CountDownLatch latch, String repoName,
+			String description, String type, boolean client, boolean ssl) throws Exception {
 		// Assumes H2 is being used for DB testing
 		File repoFile = tempFolder.newFile(repoName + CdoOsgiTestUtils.H2_SUFFIX);
 
@@ -168,20 +175,22 @@ public abstract class AbstractTest {
 		}
 		return properties;
 	}
-	
 
-//	private Map<String, Object> prepServer(CountDownLatch latch, String repoName, String description, String type) throws Exception {		
-//		// Assumes H2 is being used for DB testing
-//		File repoFile = tempFolder.newFile(repoName + CdoOsgiTestUtils.H2_SUFFIX);
-//
-//		// Synchronize to when the CdoServer is registered
-//		final CdoOsgiTestUtils.LatchServiceListener listener = new CdoOsgiTestUtils.LatchServiceListener(latch, CdoServer.class.getName());
-//		context.addServiceListener(listener);
-//
-//		// Prep
-//		final Map<String, Object> properties = new HashMap<>();
-//		testUtils.putTargets(properties, repoName);
-//		testUtils.putMinimalProperties(properties, description, type, testUtils.cleanH2FileUrl(repoFile));
-//		return properties;
-//	}
+	// private Map<String, Object> prepServer(CountDownLatch latch, String repoName,
+	// String description, String type) throws Exception {
+	// // Assumes H2 is being used for DB testing
+	// File repoFile = tempFolder.newFile(repoName + CdoOsgiTestUtils.H2_SUFFIX);
+	//
+	// // Synchronize to when the CdoServer is registered
+	// final CdoOsgiTestUtils.LatchServiceListener listener = new
+	// CdoOsgiTestUtils.LatchServiceListener(latch, CdoServer.class.getName());
+	// context.addServiceListener(listener);
+	//
+	// // Prep
+	// final Map<String, Object> properties = new HashMap<>();
+	// testUtils.putTargets(properties, repoName);
+	// testUtils.putMinimalProperties(properties, description, type,
+	// testUtils.cleanH2FileUrl(repoFile));
+	// return properties;
+	// }
 }
