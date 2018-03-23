@@ -43,8 +43,10 @@ public class DelegatedConnectorProviderTest {
 
 	@After
 	public void after() {
-		System.clearProperty(SSLProperties.TRUST_PATH);
-		System.clearProperty(SSLProperties.PASS_PHRASE);
+		// see org.eclipse.net4j.internal.tcp.ssl.SSLProperties.TRUST_PATH
+		System.clearProperty("org.eclipse.net4j.tcp.ssl.trust");
+		// org.eclipse.net4j.internal.tcp.ssl.SSLProperties.PASS_PHRASE
+		System.clearProperty("org.eclipse.net4j.tcp.ssl.passphrase");
 	}
 
 	@Test
