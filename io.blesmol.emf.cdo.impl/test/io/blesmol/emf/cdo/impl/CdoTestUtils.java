@@ -1,7 +1,6 @@
 package io.blesmol.emf.cdo.impl;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -17,8 +16,6 @@ import org.eclipse.net4j.jvm.JVMUtil;
 import org.eclipse.net4j.util.container.ContainerUtil;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.h2.jdbcx.JdbcDataSource;
-
-import io.blesmol.emf.cdo.impl.CdoServerImpl;
 
 public class CdoTestUtils {
 

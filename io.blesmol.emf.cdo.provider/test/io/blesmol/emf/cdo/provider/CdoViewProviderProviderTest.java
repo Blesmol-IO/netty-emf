@@ -1,7 +1,6 @@
 package io.blesmol.emf.cdo.provider;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +23,6 @@ import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.osgi.service.jdbc.DataSourceFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 
