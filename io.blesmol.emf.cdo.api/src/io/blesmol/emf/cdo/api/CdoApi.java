@@ -14,7 +14,6 @@ public interface CdoApi {
 		boolean blesmol_cdoserver_withranges() default false;
 
 		@interface Reference {
-//			String DATA_SOURCE = "blesmol.emf.cdoserver.datasource";
 			String DB_CONNECTION_PROVIDER = "blesmol.emf.cdoserver.dbconnectionprovider"; 
 			String DB_ADAPTER = "blesmol.emf.cdoserver.dbadapter";
 			String MANAGED_CONTAINER = "blesmol.emf.cdoserver.managedcontainer";
@@ -37,6 +36,10 @@ public interface CdoApi {
 		}
 	}
 
+	@interface CdoEmfRegister {
+		
+	}
+	
 	@interface IConnector {
 		String PID = "org.eclipse.net4j.connector.IConnector.pid";
 

@@ -35,7 +35,8 @@ h2: org.h2;version="[1.4.196,1.5)"
 	org.eclipse.emf.cdo.server.net4j;version=4.1,\
 	org.eclipse.emf.cdo.net4j;version=4.1,\
 	org.eclipse.emf.ecore.xmi;version=2.13,\
-	org.eclipse.emf.ecore.change;version=2.11
+	org.eclipse.emf.ecore.change;version=2.11,\
+	io.blesmol.emf.api;version=latest
 
 -testpath: \
 	${junit},\

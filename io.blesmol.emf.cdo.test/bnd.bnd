@@ -18,6 +18,9 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	osgi.core; version=6.0,\
 	osgi.cmpn; version=6.0,\
 	io.blesmol.testutil;version=latest,\
+	org.eclipse.emf.common;version=2.13,\
+	org.eclipse.emf.ecore;version=2.13,\
+	io.blesmol.emf.api;version=latest,\
 	io.blesmol.emf.cdo.api;version=latest
 
 javac.source: 1.8
@@ -66,13 +69,14 @@ javac.target: 1.8
 	org.objenesis;version='[2.6.0,2.6.1)',\
 	org.ops4j.pax.logging.pax-logging-api;version='[1.10.1,1.10.2)',\
 	org.ops4j.pax.logging.pax-logging-service;version='[1.10.1,1.10.2)',\
-	osgi.enterprise;version='[4.2.0,4.2.1)',\
 	org.eclipse.osgi.services;version='[3.6.0,3.6.1)',\
 	org.apache.felix.configadmin;version='[1.8.16,1.8.17)',\
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)',\
 	org.apache.felix.gogo.runtime;version='[1.0.10,1.0.11)',\
 	org.apache.felix.gogo.shell;version='[1.0.0,1.0.1)',\
-	io.blesmol.emf.cdo.db.h2.impl;version=snapshot
+	io.blesmol.emf.cdo.db.h2.impl;version=snapshot,\
+	io.blesmol.emf.api;version=snapshot,\
+	io.blesmol.emf.provider;version=snapshot
 
 #	org.eclipse.equinox.cm;version='[1.2.0,1.2.1)',\
 
@@ -96,6 +100,7 @@ Private-Package: io.blesmol.emf.cdo.test
 	osgi.identity;filter:='(osgi.identity=org.ops4j.pax.logging.pax-logging-service)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.db.h2.provider)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.provider)',\
+	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.provider)',\
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.cdo.test)'
 
 # 	osgi.identity;filter:='(osgi.identity=org.eclipse.equinox.cm)',\

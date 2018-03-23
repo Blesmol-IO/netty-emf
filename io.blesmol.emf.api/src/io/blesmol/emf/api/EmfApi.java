@@ -30,23 +30,36 @@ public interface EmfApi {
 	 * @see org.eclipse.emf.ecore.resource.Resource.Factory
 	 */
 	@interface Resource_Factory {
+		
+		String PID = "org.eclipse.emf.ecore.resource.Resource.Factory";
+
 		String emf_resource_factory_scheme();
 
 		String emf_resource_factory_extension();
 
 		String emf_resource_factory_contenttype();
+		
+		@interface Reference {
+			String RESOURCE_FACTORY_REGISTRY = "emf.resourcefactory.resourcefactoryregistry";
+		}
 	}
 
 	/**
 	 * @see org.eclipse.emf.ecore.resource.Resource.Factory.Descriptor
 	 */
 	@interface Resource_Factory_Descriptor {
+		
+		String PID = "org.eclipse.emf.ecore.resource.Resource.Factory.Descriptor";
 
 		String emf_resource_factory_scheme();
 
 		String emf_resource_factory_extension();
 
 		String emf_resource_factory_contenttype();
+		
+		@interface Reference {
+			String RESOURCE_FACTORY_REGISTRY = "emf.resourcefactorydescriptor.resourcefactoryregistry";
+		}
 	}
 
 	//
