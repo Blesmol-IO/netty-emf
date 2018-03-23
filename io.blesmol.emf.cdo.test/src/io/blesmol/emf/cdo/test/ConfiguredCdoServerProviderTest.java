@@ -14,7 +14,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -27,18 +26,30 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
-import org.osgi.service.jdbc.DataSourceFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoServer;
 import io.blesmol.testutil.ServiceHelper;
 
+/**
+ * 
+ * The tests below use a thread sleep as a synchronizer to wait for dependent
+ * bundles to load after the CdoServer is REGISTERED. However, this only occurs
+ * once per OSGi container instantiation versus once per test. If assertion fails
+ * occur at the end with a message like so:
+ * 
+ * java.lang.AssertionError: expected:<8> but was:<4>
+ * 
+ * Consider either adding logic to wait for this one-time event (which might be
+ * Equinox-specific) or increase the sleep time.
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class ConfiguredCdoServerProviderTest {
+
+	private static final String H2_SUFFIX = ".mv.db";
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -48,7 +59,7 @@ public class ConfiguredCdoServerProviderTest {
 
 	private String cleanH2FileUrl(File file) throws Exception {
 		String results = file.toURI().toURL().toString();
-		results = results.substring(0, results.indexOf(".mv.db"));
+		results = results.substring(0, results.indexOf(H2_SUFFIX));
 		return results;
 	}
 
@@ -91,18 +102,15 @@ public class ConfiguredCdoServerProviderTest {
 		public void serviceChanged(ServiceEvent event) {
 			if (event.getType() != ServiceEvent.REGISTERED)
 				return;
-			// System.out.println(event.getSource());
-			// Hacky way to verify; obtaining the service reference and then the
-			// service causes unusual behavior, so don't do that :)
+
+			// Hack-y way, and probably implementation-specific way on filtering for source
+			// references.
+			// Note: obtaining the service reference and getting the service causes unusual
+			// behavior, so don't do that :)
 			if (event.getSource().toString().contains(sourceName)) {
 				latch.countDown();
 			}
 		}
-
-	}
-
-	@Before
-	public void before() throws Exception {
 
 	}
 
@@ -114,40 +122,42 @@ public class ConfiguredCdoServerProviderTest {
 	@Test
 	public void shouldConfigureSingleJvmServer() throws Exception {
 
-		String repoName = "jvmTest1";
-		// H2
-		File repoFile = tempFolder.newFile(repoName + ".mv.db");
+		final String repoName = "jvmTest1";
+		final String description = getClass().getName();
+		final String type = "jvm";
+		// Assumes H2 is being used for DB testing
+		File repoFile = tempFolder.newFile(repoName + H2_SUFFIX);
 
+		// Synchronize to when the CdoServer is registered
 		final CountDownLatch latch = new CountDownLatch(1);
 		final LatchServiceListener listener = new LatchServiceListener(latch, CdoServer.class.getName());
 		context.addServiceListener(listener);
 
 		// Prep
-		Map<String, Object> jvmProperties = new HashMap<>();
-		putTargets(jvmProperties, repoName);
-		putMinimalProperties(jvmProperties, getClass().getName(), "jvm", cleanH2FileUrl(repoFile));
+		Map<String, Object> properties = new HashMap<>();
+		putTargets(properties, repoName);
+		putMinimalProperties(properties, description, type, cleanH2FileUrl(repoFile));
 
-		// Configure
-		Configuration adapterConfig = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.IDBAdapter.PID, jvmProperties);
-		Configuration connectionProvider = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.IDBConnectionProvider.PID, jvmProperties);
-		Configuration containerConfig = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.IManagedContainer.PID, jvmProperties);
-		Configuration acceptorConfig = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.IAcceptor.PID, jvmProperties);
-		Configuration connectorConfig = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.IConnector.PID, jvmProperties);
-		Configuration cdoServer = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
-				CdoApi.CdoServer.PID, jvmProperties);
+		// Configure, ignoring configurations except for CdoServer
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBConnectionProvider.PID,
+				properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, properties);
+		// serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+		// CdoApi.IConnector.PID, properties);
+		final Configuration cdoServer = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+				CdoApi.CdoServer.PID, properties);
 
 		// Verify
-		assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
+		Thread.sleep(1500);
 
-		// Then wait a second for dependent bundles to load after the cdo server is registered
-		Thread.sleep(1000);
+		// Obtain the SCR and observe our CdoServer's configured component
 		ServiceComponentRuntime scr = serviceHelper.getService(context, ServiceComponentRuntime.class, Optional.empty(),
 				100);
+
+		// Fragile! Hardcoded BSN and provider type
 		Optional<Bundle> optBundle = Arrays.stream(context.getBundles())
 				.filter(b -> b.getSymbolicName().contains("io.blesmol.emf.cdo.provider")).findFirst();
 		ComponentDescriptionDTO descriptionDto = scr.getComponentDescriptionDTO(optBundle.get(),
@@ -155,74 +165,130 @@ public class ConfiguredCdoServerProviderTest {
 		assertNotNull(descriptionDto);
 
 		Collection<ComponentConfigurationDTO> configurationDtos = scr.getComponentConfigurationDTOs(descriptionDto);
+		// Filter on the service pid returned by the CdoServer configuration against
+		// whatever is registered
 		ComponentConfigurationDTO cdoServerDto = configurationDtos.stream()
 				.filter(d -> ((String) d.properties.get(Constants.SERVICE_PID)).equals(cdoServer.getPid())).findFirst()
 				.get();
-		
-		// Hack: if this assertion fails increase the sleep time above
+
+		// Hack: if this assertion fails check that the BSN and provider type are
+		// correct. If they are, consider increasing the sleep time above or figure out
+		// a better synchronizer.
 		assertEquals(ComponentConfigurationDTO.ACTIVE, cdoServerDto.state);
 	}
 
 	@Test
 	public void shouldConfigureSingleTcpServer() throws Exception {
 
-		String repoName = "tcpTest1";
-		// H2
-		File repoFile = tempFolder.newFile(repoName + ".mv.db");
+		final String repoName = "tcpTest";
+		final String description = "127.0.0.1:55443";
+		final String type = "tcp";
+		File repoFile = tempFolder.newFile(repoName + H2_SUFFIX);
 
-		// Prep
-		Map<String, Object> tcpProperties = new HashMap<>();
-		putTargets(tcpProperties, repoName);
-		putMinimalProperties(tcpProperties, "127.0.0.1:55080", "tcp", cleanH2FileUrl(repoFile));
+		// Synchronize to when the CdoServer is registered
 		final CountDownLatch latch = new CountDownLatch(1);
 		final LatchServiceListener listener = new LatchServiceListener(latch, CdoServer.class.getName());
 		context.addServiceListener(listener);
 
-		// Configure
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID,
-				tcpProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, tcpProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IConnector.PID, tcpProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, tcpProperties);
-		String h2DataSourceFactoryFilter = "(osgi.jdbc.driver.class=org.h2.Driver)";
-		DataSourceFactory h2DataSourceFactory = serviceHelper.getService(context, DataSourceFactory.class,
-				Optional.of(h2DataSourceFactoryFilter), 100);
-		assertNotNull(h2DataSourceFactory);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.CdoServer.PID, tcpProperties);
+		// Prep
+		Map<String, Object> properties = new HashMap<>();
+		putTargets(properties, description);
+		putMinimalProperties(properties, description, type, cleanH2FileUrl(repoFile));
+
+		// Configure, ignoring configurations except for CdoServer
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBConnectionProvider.PID,
+				properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, properties);
+		// serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+		// CdoApi.IConnector.PID, properties);
+		final Configuration cdoServer = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+				CdoApi.CdoServer.PID, properties);
 
 		// Verify
-		assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
+		Thread.sleep(1500);
+
+		// Obtain the SCR and observe our CdoServer's configured component
+		ServiceComponentRuntime scr = serviceHelper.getService(context, ServiceComponentRuntime.class, Optional.empty(),
+				100);
+
+		// Fragile! Hardcoded BSN and provider type
+		Optional<Bundle> optBundle = Arrays.stream(context.getBundles())
+				.filter(b -> b.getSymbolicName().contains("io.blesmol.emf.cdo.provider")).findFirst();
+		ComponentDescriptionDTO descriptionDto = scr.getComponentDescriptionDTO(optBundle.get(),
+				"io.blesmol.emf.cdo.provider.CdoServerProvider");
+		assertNotNull(descriptionDto);
+
+		Collection<ComponentConfigurationDTO> configurationDtos = scr.getComponentConfigurationDTOs(descriptionDto);
+		// Filter on the service pid returned by the CdoServer configuration against
+		// whatever is registered
+		ComponentConfigurationDTO cdoServerDto = configurationDtos.stream()
+				.filter(d -> ((String) d.properties.get(Constants.SERVICE_PID)).equals(cdoServer.getPid())).findFirst()
+				.get();
+
+		// Hack: if this assertion fails check that the BSN and provider type are
+		// correct. If they are, consider increasing the sleep time above or figure out
+		// a better synchronizer.
+		assertEquals(ComponentConfigurationDTO.ACTIVE, cdoServerDto.state);
 	}
 
 	@Test
 	public void shouldConfigureSingleSslServer() throws Exception {
 
-		String repoName = "sslTest1";
-		// H2
-		File repoFile = tempFolder.newFile(repoName + ".mv.db");
+		final String repoName = "sslTest";
+		final String description = "127.0.0.1:55444";
+		final String type = "ssl";
+		File repoFile = tempFolder.newFile(repoName + H2_SUFFIX);
 
-		// Prep
-		Map<String, Object> sslProperties = new HashMap<>();
-		putTargets(sslProperties, "tcpTest1");
-		putMinimalProperties(sslProperties, "127.0.0.1:55443", "ssl", cleanH2FileUrl(repoFile));
+		// Synchronize to when the CdoServer is registered
 		final CountDownLatch latch = new CountDownLatch(1);
 		final LatchServiceListener listener = new LatchServiceListener(latch, CdoServer.class.getName());
 		context.addServiceListener(listener);
 
-		// Configure
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID,
-				sslProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, sslProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IConnector.PID, sslProperties);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, sslProperties);
-		String h2DataSourceFactoryFilter = "(osgi.jdbc.driver.class=org.h2.Driver)";
-		DataSourceFactory h2DataSourceFactory = serviceHelper.getService(context, DataSourceFactory.class,
-				Optional.of(h2DataSourceFactoryFilter), 100);
-		assertNotNull(h2DataSourceFactory);
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.CdoServer.PID, sslProperties);
+		// Prep
+		Map<String, Object> properties = new HashMap<>();
+		putTargets(properties, description);
+		putMinimalProperties(properties, description, type, cleanH2FileUrl(repoFile));
+
+		// Configure, ignoring configurations except for CdoServer
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBAdapter.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IDBConnectionProvider.PID,
+				properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IManagedContainer.PID, properties);
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, properties);
+		// serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+		// CdoApi.IConnector.PID, properties);
+		final Configuration cdoServer = serviceHelper.createFactoryConfiguration(context, Optional.empty(),
+				CdoApi.CdoServer.PID, properties);
 
 		// Verify
-		assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(2000, TimeUnit.MILLISECONDS));
+		Thread.sleep(1500);
+
+		// Obtain the SCR and observe our CdoServer's configured component
+		ServiceComponentRuntime scr = serviceHelper.getService(context, ServiceComponentRuntime.class, Optional.empty(),
+				100);
+
+		// Fragile! Hardcoded BSN and provider type
+		Optional<Bundle> optBundle = Arrays.stream(context.getBundles())
+				.filter(b -> b.getSymbolicName().contains("io.blesmol.emf.cdo.provider")).findFirst();
+		ComponentDescriptionDTO descriptionDto = scr.getComponentDescriptionDTO(optBundle.get(),
+				"io.blesmol.emf.cdo.provider.CdoServerProvider");
+		assertNotNull(descriptionDto);
+
+		Collection<ComponentConfigurationDTO> configurationDtos = scr.getComponentConfigurationDTOs(descriptionDto);
+		// Filter on the service pid returned by the CdoServer configuration against
+		// whatever is registered
+		ComponentConfigurationDTO cdoServerDto = configurationDtos.stream()
+				.filter(d -> ((String) d.properties.get(Constants.SERVICE_PID)).equals(cdoServer.getPid())).findFirst()
+				.get();
+
+		// Hack: if this assertion fails check that the BSN and provider type are
+		// correct. If they are, consider increasing the sleep time above or figure out
+		// a better synchronizer.
+		assertEquals(ComponentConfigurationDTO.ACTIVE, cdoServerDto.state);
 	}
 
 }
