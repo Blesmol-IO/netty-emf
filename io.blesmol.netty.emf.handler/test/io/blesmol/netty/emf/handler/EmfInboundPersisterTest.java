@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.junit.Test;
 
+import io.blesmol.emf.test.util.EmfTestUtils;
 import io.blesmol.netty.emf.model.EByteBufHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

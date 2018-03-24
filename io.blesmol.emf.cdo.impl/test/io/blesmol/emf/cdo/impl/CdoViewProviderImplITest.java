@@ -3,6 +3,7 @@ package io.blesmol.emf.cdo.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import java.util.Map;
 import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.server.IRepository.Props;
 import org.eclipse.emf.cdo.transaction.CDOTransaction;
+import org.eclipse.emf.cdo.util.CDOURIData;
+import org.eclipse.emf.cdo.util.InvalidURIException;
 import org.eclipse.emf.cdo.view.CDOViewProvider;
 import org.eclipse.emf.cdo.view.CDOViewProviderRegistry;
 import org.eclipse.emf.common.util.URI;
@@ -22,8 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import io.blesmol.emf.cdo.impl.CdoServerImpl;
-import io.blesmol.emf.cdo.impl.CdoViewProviderImpl;
+import io.blesmol.emf.cdo.api.CdoApi;
 
 public class CdoViewProviderImplITest {
 
@@ -68,5 +70,56 @@ public class CdoViewProviderImplITest {
 		LifecycleUtil.deactivate(viewProvider);
 		cdoServer.deactivate();
 	}
+	
+	@Test
+	public void shouldHaveInvalidUri() {
+		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
 
+		// No resource
+		URI uri = URI.createURI("cdo://bob");
+		try {
+			viewProvider.getView(uri, null);
+			fail();
+		} catch (InvalidURIException e) {
+		}
+		
+		// Other tests?
+		
+	}
+
+	@Test
+	public void shouldHaveValidUri() {
+
+		final String expectedRepoName = "repository";
+		final String expectedResourceName = "resource";
+		final String expectedAcceptorName = expectedRepoName; // "acceptor";
+		// cdo.net4j. ConnectorType :// [User [: Password] @] ConnectorSpecificAuthority / RepositoryName / ResourcePath 
+		URI uri = URI.createURI(String.format("cdo.net4j.jvm://%s/%s/%s", expectedAcceptorName, expectedRepoName, expectedResourceName));
+		CDOURIData uriData = new CDOURIData(uri);
+
+		assertEquals(expectedRepoName, uriData.getRepositoryName());
+		assertEquals(expectedResourceName, uriData.getResourcePath().toString());
+		assertEquals(expectedAcceptorName, uriData.getAuthority());
+		
+		// No resource
+		uri = URI.createURI(String.format("cdo.net4j.jvm://%s/%s/", expectedAcceptorName, expectedRepoName));
+		uriData = new CDOURIData(uri);
+
+		assertEquals(expectedRepoName, uriData.getRepositoryName());
+		assertEquals("/", uriData.getResourcePath().toString());
+		assertEquals(expectedAcceptorName, uriData.getAuthority());
+
+	}
+
+	@Test
+	public void shouldSupportValidUriInRegex() {
+		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
+		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
+		viewProvider.setPriority(500);
+		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo://notused")));
+		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.jvm://notused")));
+		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.tcp://notused")));
+		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.ssl://notused")));
+		
+	}
 }

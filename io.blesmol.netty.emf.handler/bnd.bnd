@@ -14,7 +14,8 @@
 
 -testpath: \
 	${junit},\
-	slf4j.simple;version=1.7
+	slf4j.simple;version=1.7,\
+	io.blesmol.emf.test;version=latest
 
 javac.source: 1.8
 javac.target: 1.8

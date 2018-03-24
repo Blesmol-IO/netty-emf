@@ -21,7 +21,8 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.eclipse.emf.common;version=2.13,\
 	org.eclipse.emf.ecore;version=2.13,\
 	io.blesmol.emf.api;version=latest,\
-	io.blesmol.emf.cdo.api;version=latest
+	io.blesmol.emf.cdo.api;version=latest,\
+	io.blesmol.emf.test;version=latest
 
 javac.source: 1.8
 javac.target: 1.8
@@ -76,7 +77,8 @@ javac.target: 1.8
 	org.apache.felix.gogo.shell;version='[1.0.0,1.0.1)',\
 	io.blesmol.emf.cdo.db.h2.impl;version=snapshot,\
 	io.blesmol.emf.api;version=snapshot,\
-	io.blesmol.emf.provider;version=snapshot
+	io.blesmol.emf.provider;version=snapshot,\
+	io.blesmol.emf.test;version=snapshot
 
 #	org.eclipse.equinox.cm;version='[1.2.0,1.2.1)',\
 
@@ -108,8 +110,7 @@ Private-Package: io.blesmol.emf.cdo.test
 
 -runproperties.eqnx: \
 	osgi.console=,\
-	osgi.console.enable.builtin=false
-
-#	osgi.debug=
+	osgi.console.enable.builtin=false,\
+	osgi.debug=
 
 -runee: JavaSE-1.8

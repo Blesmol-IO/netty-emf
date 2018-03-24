@@ -37,7 +37,8 @@ h2: org.h2;version="[1.4.196,1.5)"
 	org.eclipse.emf.cdo.net4j;version=4.1,\
 	org.eclipse.emf.ecore.xmi;version=2.13,\
 	org.eclipse.emf.ecore.change;version=2.11,\
-	io.blesmol.emf.cdo.api;version=latest
+	io.blesmol.emf.cdo.api;version=latest,\
+	slf4j.api;version=1.7
 
 #	org.eclipse.core.resources;version=3.12,\
 #	org.eclipse.core.runtime;version=3.13

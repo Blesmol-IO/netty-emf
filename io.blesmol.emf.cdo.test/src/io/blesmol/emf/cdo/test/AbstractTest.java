@@ -6,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Collection;
@@ -169,7 +172,16 @@ public abstract class AbstractTest {
 	protected Map<String, Object> prep(TemporaryFolder tempFolder, String latchTo, CountDownLatch latch,
 			String repoName, String description, String type, boolean includeClient, boolean ssl) throws Exception {
 		// Assumes H2 is being used for DB testing
-		File repoFile = tempFolder.newFile(repoName + CdoOsgiTestUtils.H2_SUFFIX);
+		String repoFileName = repoName + CdoOsgiTestUtils.H2_SUFFIX;
+		Path repoPath = Paths.get(tempFolder.getRoot().getAbsolutePath(), repoFileName);
+		
+		// Have we been here before?
+		File repoFile;
+		if (!Files.exists(repoPath)) {
+			repoFile = tempFolder.newFile(repoFileName);
+		} else {
+			repoFile = repoPath.toFile();
+		}
 
 		// Synchronize to when the CdoViewProvider is registered
 		addLatchListener(latch, latchTo);

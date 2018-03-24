@@ -47,6 +47,7 @@ public class ResourceProvider implements Resource {
 				delegate = resourceSet.getResource(uri, true);
 				logger.log(LogService.LOG_DEBUG, String.format("Obtained a resource via the URI %s.", uri.toString()));
 			} catch (Exception e) {
+				logger.log(LogService.LOG_DEBUG, String.format("Could not obtain resource via URI %s, cause: %s", uri.toString(), e));
 				_loadOnDemand = false;
 			}
 		}

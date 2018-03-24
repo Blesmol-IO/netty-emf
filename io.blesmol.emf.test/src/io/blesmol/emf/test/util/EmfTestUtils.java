@@ -1,4 +1,4 @@
-package io.blesmol.netty.emf.handler;
+package io.blesmol.emf.test.util;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.EcorePackage;
 public class EmfTestUtils {
 
 	final EcoreFactory ecoreFactory = EcoreFactory.eINSTANCE;
-	
+
 	public EClass eClass(String name) {
 		final EClass result = ecoreFactory.createEClass();
 		result.setName(name);
@@ -33,38 +33,11 @@ public class EmfTestUtils {
 		result.getEClassifiers().add(eClass);
 		return result;
 	}
-	
-	
-	
-	
-	public EObject eObject (String className, String attributeName, String packageName, String nsPrefix, String nsUri) {
+
+	public EObject eObject(String className, String attributeName, String packageName, String nsPrefix, String nsUri) {
 		EClass eClass = eClass(className);
 		eAttribute(eClass, attributeName);
 		EPackage ePackage = ePackage(eClass, packageName, nsPrefix, nsUri);
 		return ePackage.getEFactoryInstance().create(eClass);
 	}
-	/*
-
-		final EPackage receiverPackage = ecoreFactory.createEPackage();
-		receiverPackage.setName("ReceiverPackage");
-		receiverPackage.setNsPrefix("receiverPackage");
-		receiverPackage.setNsURI("blesmol://test/receiver");
-		receiverPackage.getEClassifiers().add(receiverClass);
-		final EObject receiver = receiverPackage.getEFactoryInstance().create(receiverClass);
-
-		final EmfPersister persister = new EmfPersister();
-		persister.receiver = receiver;
-		persister.featureName = thingName;
-		persister.eventExecutorGroup = new DefaultEventExecutorGroup(1);
-
-		final EClass messageClass = ecoreFactory.createEClass();
-		messageClass.setName("Message");
-		final EPackage messagePackage = ecoreFactory.createEPackage();
-		messagePackage.setName("MessagePackage");
-		messagePackage.setNsPrefix("messagePackage");
-		messagePackage.setNsURI("blesmol://test/message");
-		messagePackage.getEClassifiers().add(messageClass);
-		final EObject expected = messagePackage.getEFactoryInstance().create(messageClass);
-		
-	 */
 }

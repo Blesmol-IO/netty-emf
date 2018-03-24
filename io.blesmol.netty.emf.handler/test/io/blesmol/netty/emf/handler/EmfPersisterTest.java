@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.junit.Test;
 
+import io.blesmol.emf.test.util.EmfTestUtils;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 
 public class EmfPersisterTest {

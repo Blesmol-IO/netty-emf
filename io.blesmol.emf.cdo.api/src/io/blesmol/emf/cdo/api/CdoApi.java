@@ -23,8 +23,8 @@ public interface CdoApi {
 
 	@interface CdoViewProvider {
 		String PID = "io.blesmol.emf.cdo.api.CdoViewProvider.pid";
-
-		String blesmol_cdoviewprovider_regex() default "cdo:.*";
+		String REGEX = "(cdo|cdo\\.net4j\\.(jvm|tcp|ssl)):.*";
+		String blesmol_cdoviewprovider_regex() default REGEX;
 
 		/**
 		 * @see org.eclipse.emf.cdo.view.CDOViewProvider.DEFAULT_PRIORITY

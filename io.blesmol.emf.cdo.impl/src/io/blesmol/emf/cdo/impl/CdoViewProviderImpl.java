@@ -3,6 +3,8 @@ package io.blesmol.emf.cdo.impl;
 import org.eclipse.emf.cdo.net4j.CDONet4jSession;
 import org.eclipse.emf.cdo.net4j.CDONet4jSessionConfiguration;
 import org.eclipse.emf.cdo.net4j.CDONet4jUtil;
+import org.eclipse.emf.cdo.util.CDOURIData;
+import org.eclipse.emf.cdo.util.CDOURIUtil;
 import org.eclipse.emf.cdo.view.AbstractCDOViewProvider;
 import org.eclipse.emf.cdo.view.CDOView;
 import org.eclipse.emf.cdo.view.CDOViewProviderRegistry;
@@ -10,10 +12,14 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.net4j.connector.IConnector;
 import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.blesmol.emf.cdo.api.CdoViewProvider;
 
 public class CdoViewProviderImpl extends AbstractCDOViewProvider implements CdoViewProvider {
+
+	private static Logger logger = LoggerFactory.getLogger(CdoViewProvider.class);
 
 	/**
 	 * A connector from a prepared, active container
@@ -30,7 +36,7 @@ public class CdoViewProviderImpl extends AbstractCDOViewProvider implements CdoV
 		// Register
 		CDOViewProviderRegistry.INSTANCE.addViewProvider(this);
 	}
-	
+
 	protected void deactivate() {
 		CDOViewProviderRegistry.INSTANCE.removeViewProvider(this);
 		LifecycleUtil.deactivate(connector);
@@ -38,22 +44,23 @@ public class CdoViewProviderImpl extends AbstractCDOViewProvider implements CdoV
 
 	@Override
 	public CDOView getView(URI uri, ResourceSet resourceSet) {
-		final String repoName = getPath(uri);
+		logger.debug("Getting view for resource set {}, URI {}", resourceSet, uri);
+		CDOURIData uriData = new CDOURIData(uri);
+		final String repoName = uriData.getRepositoryName();
+		assert repoName != null;
 		final CDONet4jSessionConfiguration config = CDONet4jUtil.createNet4jSessionConfiguration();
 		config.setConnector(connector);
 		config.setRepositoryName(repoName);
-		final CDONet4jSession session = config.openNet4jSession();
-		return session.openTransaction();
+		try {
+			final CDONet4jSession session = config.openNet4jSession();
+			logger.debug("Opening transaction on {} via URI {}", resourceSet, uriData);
+			return session.openTransaction(resourceSet);
+		} catch (Exception e) {
+			logger.debug("Failed on opening transaction on resource set {}, URI {}, cause {}", resourceSet,
+					uriData, e);
+			return null;
+		}
+
 	}
 
-	@Override
-	public String getPath(URI uri) {
-		if (uri.hasAbsolutePath()) {
-			return uri.path().substring(1);
-		} else if (uri.hasRelativePath()) {
-			return uri.path();
-		} else {
-			throw new IllegalArgumentException("URI does not have absolute or relative path: " + uri.toString());
-		}
-	}
 }

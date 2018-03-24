@@ -35,7 +35,7 @@ public class CdoOsgiTestUtils {
 
 	public void putEmfProperties(Map<String, Object> properties, String uri) {
 		properties.put("emf.uri", uri);
-		properties.put(EmfApi.SCHEME, "cdo");
+		properties.put(EmfApi.SCHEME, new String[]{"cdo", "cdo.net4j.jvm", "cdo.net4j.tcp", "cdo.net4j.ssl"});
 
 	}
 
