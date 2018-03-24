@@ -16,7 +16,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.Resource_Factory_Registry.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = Factory.Registry.class)
+@Component(configurationPid = EmfApi.Resource_Factory_Registry.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = Factory.Registry.class, immediate=true)
 public class ResourceFactoryRegistryProvider extends ResourceFactoryRegistryImpl {
 
 	private volatile URIConverter converter;

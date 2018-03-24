@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.service.cm.Configuration;
 
+import io.blesmol.emf.cdo.api.CdoServer;
+
 /**
  * 
  * The tests below use a thread sleep as a synchronizer to wait for dependent
@@ -43,12 +45,12 @@ public class ConfiguredCdoServerProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, /* client */ false,
+		final Map<String, Object> properties = prep(tempFolder, CdoServer.class.getName(), latch, repoName, description, type, /* client */ false,
 				/* ssl */ false);
 		final Configuration cdoServer = configureForServer(properties);
 
 		// Verify
-		verify(latch, cdoServer, PROVIDER_BUNDLE, CDO_SERVER_TYPE);
+		verify(latch, cdoServer, CDO_PROVIDER_BUNDLE, CDO_SERVER_TYPE);
 	}
 
 	@Test
@@ -60,12 +62,12 @@ public class ConfiguredCdoServerProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, /* client */ false,
+		final Map<String, Object> properties = prep(tempFolder, CdoServer.class.getName(), latch, repoName, description, type, /* client */ false,
 				/* ssl */ false);
 		final Configuration cdoServer = configureForServer(properties);
 
 		// Verify
-		verify(latch, cdoServer, PROVIDER_BUNDLE, CDO_SERVER_TYPE);
+		verify(latch, cdoServer, CDO_PROVIDER_BUNDLE, CDO_SERVER_TYPE);
 	}
 
 	@Test
@@ -77,12 +79,12 @@ public class ConfiguredCdoServerProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, /* client */ false,
+		final Map<String, Object> properties = prep(tempFolder, CdoServer.class.getName(), latch, repoName, description, type, /* client */ false,
 				/* ssl */ true);
 		final Configuration cdoServer = configureForServer(properties);
 
 		// Verify
-		verify(latch, cdoServer, PROVIDER_BUNDLE, CDO_SERVER_TYPE);
+		verify(latch, cdoServer, CDO_PROVIDER_BUNDLE, CDO_SERVER_TYPE);
 	}
 
 }

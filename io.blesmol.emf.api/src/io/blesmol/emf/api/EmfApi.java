@@ -77,7 +77,6 @@ public interface EmfApi {
 
 		@interface Reference {
 			String RESOURCE_SET = "emf.resoure.resourceset";
-			String EXECUTOR_SERVICE = "emf.resource.executorservice";
 		}
 	}
 

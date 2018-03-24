@@ -7,7 +7,7 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.URIConverter.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = URIConverter.class)
+@Component(configurationPid = EmfApi.URIConverter.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = URIConverter.class, immediate=true)
 public class UriConverterProvider extends ExtensibleURIConverterImpl {
 
 }

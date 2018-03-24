@@ -18,7 +18,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.ResourceSet.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = ResourceSet.class)
+@Component(configurationPid = EmfApi.ResourceSet.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = ResourceSet.class, immediate=true)
 public class ResourceSetProvider extends ResourceSetImpl {
 
 	private String servicePid;

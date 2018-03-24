@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.service.cm.Configuration;
 
+import io.blesmol.emf.cdo.api.CdoViewProvider;
+
 /**
  * 
  * The tests below use a thread sleep as a synchronizer to wait for dependent
@@ -43,12 +45,12 @@ public class ConfiguredCdoViewProviderProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, /* client */ true,
+		final Map<String, Object> properties = prep(tempFolder, CdoViewProvider.class.getName(), latch, repoName, description, type, /* client */ true,
 				/* ssl */ false);
 		final Configuration cdoViewProvider = configureForViewProvider(properties);
 
 		// Verify
-		verify(latch, cdoViewProvider, PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
+		verify(latch, cdoViewProvider, CDO_PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
 	}
 
 	@Test
@@ -60,11 +62,11 @@ public class ConfiguredCdoViewProviderProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, true, false);
+		final Map<String, Object> properties = prep(tempFolder, CdoViewProvider.class.getName(), latch, repoName, description, type, true, false);
 		final Configuration cdoViewProvider = configureForViewProvider(properties);
 
 		// Verify
-		verify(latch, cdoViewProvider, PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
+		verify(latch, cdoViewProvider, CDO_PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
 	}
 
 	@Test
@@ -76,11 +78,11 @@ public class ConfiguredCdoViewProviderProviderTest extends AbstractTest {
 
 		// Prep & configure
 		final CountDownLatch latch = new CountDownLatch(1);
-		final Map<String, Object> properties = prep(tempFolder, latch, repoName, description, type, true, true);
+		final Map<String, Object> properties = prep(tempFolder, CdoViewProvider.class.getName(), latch, repoName, description, type, true, true);
 		final Configuration cdoViewProvider = configureForViewProvider(properties);
 
 		// Verify
-		verify(latch, cdoViewProvider, PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
+		verify(latch, cdoViewProvider, CDO_PROVIDER_BUNDLE, VIEW_PROVIDER_TYPE);
 	}
 
 }

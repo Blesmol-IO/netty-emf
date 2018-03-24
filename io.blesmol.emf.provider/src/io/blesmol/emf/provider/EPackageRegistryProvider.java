@@ -18,7 +18,7 @@ import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.EPackage_Registry.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = EPackage.Registry.class)
+@Component(configurationPid = EmfApi.EPackage_Registry.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = EPackage.Registry.class, immediate=true)
 public class EPackageRegistryProvider implements EPackage.Registry {
 
 	private final Map<String, Object> delegate = new ConcurrentHashMap<>();

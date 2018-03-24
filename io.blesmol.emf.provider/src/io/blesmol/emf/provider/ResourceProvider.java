@@ -21,7 +21,7 @@ import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.Resource.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Resource.class)
+@Component(configurationPid = EmfApi.Resource.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Resource.class, immediate=true)
 public class ResourceProvider implements Resource {
 
 	Resource delegate;
