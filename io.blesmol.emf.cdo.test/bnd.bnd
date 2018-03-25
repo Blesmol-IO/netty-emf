@@ -22,7 +22,29 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.eclipse.emf.ecore;version=2.13,\
 	io.blesmol.emf.api;version=latest,\
 	io.blesmol.emf.cdo.api;version=latest,\
-	io.blesmol.emf.test;version=latest
+	io.blesmol.emf.test;version=latest,\
+	org.eclipse.emf.cdo;version=4.6,\
+	org.eclipse.emf.cdo.server;version=4.6,\
+	org.eclipse.emf.cdo.server.db;version=4.5,\
+	org.eclipse.emf.cdo.server.embedded;version=4.6,\
+	org.eclipse.net4j;version=4.6,\
+	org.eclipse.net4j.tcp;version=4.1,\
+	org.eclipse.net4j.db;version=4.6,\
+	org.eclipse.net4j.db.h2;version=4.3,\
+	org.eclipse.net4j.db.jdbc;version=4.3,\
+	org.eclipse.net4j.jvm;version=4.1,\
+	org.eclipse.net4j.util;version=3.7,\
+	org.eclipse.emf.cdo.common;version=4.6,\
+	org.eclipse.emf.cdo.common.db;version=3.0,\
+	org.eclipse.equinox.common;version=3.9,\
+	org.eclipse.equinox.registry;version=3.7,\
+	org.eclipse.emf.common;version=2.13,\
+	org.eclipse.emf.ecore;version=2.13,\
+	org.eclipse.emf.cdo.server.net4j;version=4.1,\
+	org.eclipse.emf.cdo.net4j;version=4.1,\
+	org.eclipse.emf.ecore.xmi;version=2.13,\
+	org.eclipse.emf.ecore.change;version=2.11,\
+	org.h2;version=1.4
 
 javac.source: 1.8
 javac.target: 1.8
@@ -114,3 +136,4 @@ Private-Package: io.blesmol.emf.cdo.test
 	osgi.debug=
 
 -runee: JavaSE-1.8
+Export-Package: io.blesmol.emf.cdo.test.util

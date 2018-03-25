@@ -25,7 +25,7 @@ public class CdoServerITest {
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	private CdoTestUtils cdoTestUtils = new CdoTestUtils();
+	private ImplCdoTestUtils cdoTestUtils = new ImplCdoTestUtils();
 
 	@Test
 	public void shouldStartServer() throws Exception {

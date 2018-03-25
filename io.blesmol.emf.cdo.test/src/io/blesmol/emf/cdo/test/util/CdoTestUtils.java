@@ -1,11 +1,17 @@
-package io.blesmol.emf.cdo.provider;
+package io.blesmol.emf.cdo.test.util;
 
 import java.io.File;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.eclipse.emf.cdo.eresource.impl.CDOResourceFactoryImpl;
 import org.eclipse.emf.cdo.net4j.CDONet4jUtil;
 import org.eclipse.emf.cdo.server.net4j.CDONet4jServerUtil;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceFactoryRegistryImpl;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.net4j.Net4jUtil;
 import org.eclipse.net4j.acceptor.IAcceptor;
 import org.eclipse.net4j.connector.IConnector;
@@ -16,8 +22,9 @@ import org.eclipse.net4j.util.container.ContainerUtil;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.h2.jdbcx.JdbcDataSource;
 
-// FIXME: this is copy-pasta'd from the impl project
 public class CdoTestUtils {
+
+	public static final String SCHEMA_JVM = "cdo.net4j.jvm";
 
 	public IManagedContainer serverContainer(boolean useJvm) {
 		IManagedContainer container = ContainerUtil.createContainer();
@@ -31,7 +38,7 @@ public class CdoTestUtils {
 		return container;
 	}
 
-	public IManagedContainer clientContainer() {
+	public IManagedContainer jvmClientContainer() {
 		IManagedContainer container = ContainerUtil.createContainer();
 
 		Net4jUtil.prepareContainer(container); // Register Net4j factories
@@ -52,19 +59,42 @@ public class CdoTestUtils {
 		return JVMUtil.getConnector(container, repoName);
 	}
 
-	public DataSource dataSource(File file, String repoName) {
+	public DataSource dataSource(File file, String repoName) throws Exception {
 		// Don't use memory since the schema is written and a new data source is made
-		final String dbUri = "jdbc:h2:" + file.getAbsolutePath();
+		final String dbUri = "jdbc:h2:" + file.toURI().toURL().toString(); // getAbsolutePath();
 		JdbcDataSource dataSource = new JdbcDataSource();
 		dataSource.setUrl(dbUri);
 		H2Adapter.createSchema(dataSource, repoName, true);
-		dataSource = new JdbcDataSource();
+		// dataSource = new JdbcDataSource();
 		dataSource.setURL(dbUri + ";SCHEMA=" + repoName);
 		return dataSource;
 	}
 
 	public IDBAdapter h2Adapter() {
 		return new H2Adapter();
+	}
+
+//	public CdoServerImpl server(File tempFile, String repoName, boolean auditing, boolean branching, boolean withRanges,
+//			Map<String, String> repoProps) throws Exception {
+//		CdoServerImpl cdoServer = new CdoServerImpl();
+//		cdoServer.dbAdapter = h2Adapter();
+//		cdoServer.connectionProvider = cdoServer.dbAdapter.createConnectionProvider(dataSource(tempFile, repoName));
+//		cdoServer.container = serverContainer(true);
+//		cdoServer.acceptor = getJvmAcceptor(cdoServer.container, repoName);
+//
+//		// XMI bundle needs to be on run path for internal CDO classes to work
+//		// Adding a '*' to the global resource factory registry doesn't seem to work
+//		cdoServer.activate(repoName, auditing, branching, withRanges, repoProps);
+//		return cdoServer;
+//	}
+
+	public ResourceSet createAndPrepResourceSet(String scheme) {
+		ResourceSet rs = new ResourceSetImpl();
+		// Simulate CDO resource factory
+		Resource.Factory.Registry reg = new ResourceFactoryRegistryImpl();
+		reg.getProtocolToFactoryMap().put(scheme, new CDOResourceFactoryImpl());
+		rs.setResourceFactoryRegistry(reg);
+		return rs;
 	}
 
 }

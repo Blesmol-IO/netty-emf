@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.junit.Test;
 
 import io.blesmol.emf.test.util.EmfTestUtils;
@@ -27,8 +28,8 @@ public class EmfInboundPersisterTest {
 
 		// EMF objects
 		final String receiverAttrName = "thing";
-		final EObject receiver = emfTestUtils.eObject("Receiver", receiverAttrName, "ReceiverPackage",
-				"receiverPackage", "blesmol://test/receiver");
+		final EObject receiver = emfTestUtils.eObject("Receiver", receiverAttrName, EcorePackage.Literals.EOBJECT,
+				"ReceiverPackage", "receiverPackage", "blesmol://test/receiver");
 		final EStructuralFeature receiverAttr = receiver.eClass().getEStructuralFeatures().get(0);
 		// final EObject persistedExpected = emfTestUtils.eObject("Message", "notUsed",
 		// "MessagePackage", "messagePackage", "blesmol://test/message");

@@ -41,7 +41,9 @@ h2: org.h2;version="[1.4.196,1.5)"
 -testpath: \
 	${junit},\
 	${mockito},\
-	${h2}
+	${h2},\
+	io.blesmol.emf.test;version=latest,\
+	io.blesmol.emf.cdo.test;version=latest
 
 javac.source: 1.8
 javac.target: 1.8

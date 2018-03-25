@@ -2,7 +2,7 @@ package io.blesmol.emf.cdo.provider;
 
 import java.util.Map;
 
-import org.eclipse.net4j.connector.IConnector;
+import org.eclipse.net4j.util.container.IManagedContainer;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -14,18 +14,18 @@ import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.api.CdoViewProvider;
 import io.blesmol.emf.cdo.impl.CdoViewProviderImpl;
 
-@Component(configurationPid = CdoApi.CdoViewProvider.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoViewProvider.class, immediate=true)
+@Component(configurationPid = CdoApi.CdoViewProvider.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = CdoViewProvider.class, immediate = true)
 public class CdoViewProviderProvider extends CdoViewProviderImpl {
 
 	private String servicePid;
 
-	@Reference(name = CdoApi.CdoViewProvider.Reference.CONNECTOR)
-	void setConnector(IConnector connector) {
-		this.connector = connector;
+	@Reference(name = CdoApi.CdoViewProvider.Reference.CONTAINER)
+	void setContainer(IManagedContainer container) {
+		this.container = container;
 	}
 
-	void unsetConnecto(IConnector connector) {
-		this.connector = null;
+	void unsetContainer(IManagedContainer container) {
+		this.container = null;
 	}
 
 	@Activate

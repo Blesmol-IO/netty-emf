@@ -7,7 +7,6 @@ import java.util.concurrent.CountDownLatch;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
-import io.blesmol.emf.api.EmfApi;
 import io.blesmol.emf.cdo.api.CdoApi;
 
 public class CdoOsgiTestUtils {
@@ -35,7 +34,7 @@ public class CdoOsgiTestUtils {
 
 	public void putEmfProperties(Map<String, Object> properties, String uri) {
 		properties.put("emf.uri", uri);
-		properties.put(EmfApi.SCHEME, new String[]{"cdo", "cdo.net4j.jvm", "cdo.net4j.tcp", "cdo.net4j.ssl"});
+//		properties.put(EmfApi.SCHEME, new String[]{"cdo", "cdo.net4j.jvm", "cdo.net4j.tcp", "cdo.net4j.ssl"});
 
 	}
 

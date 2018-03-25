@@ -23,7 +23,7 @@ public class CdoServerProviderTest {
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	CdoTestUtils cdoTestUtils = new CdoTestUtils();
+	ProviderCdoTestUtils cdoTestUtils = new ProviderCdoTestUtils();
 
 	@Test
 	public void shouldCreateServerProvider() throws Exception {

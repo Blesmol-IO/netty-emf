@@ -23,16 +23,24 @@ public interface CdoApi {
 
 	@interface CdoViewProvider {
 		String PID = "io.blesmol.emf.cdo.api.CdoViewProvider.pid";
-		String REGEX = "(cdo|cdo\\.net4j\\.(jvm|tcp|ssl)):.*";
+	
+		/**
+		 * Connection-aware CDO URI regex
+		 * 
+		 * @see org.eclipse.emf.cdo.util.CDOURIData
+		 */
+		String REGEX = "cdo\\.net4j\\.(jvm|tcp|ssl):.*";
 		String blesmol_cdoviewprovider_regex() default REGEX;
 
 		/**
+		 * Choose a higher priority than default so as to elide the default descriptors
+		 * 
 		 * @see org.eclipse.emf.cdo.view.CDOViewProvider.DEFAULT_PRIORITY
 		 */
-		int blesmol_cdoviewprovider_priority() default 500;
+		int blesmol_cdoviewprovider_priority() default 1000;
 
 		@interface Reference {
-			String CONNECTOR = "emf.cdo.viewprovider.connector";
+			String CONTAINER = "blesmos.cdoviewprovider.container";
 		}
 	}
 
