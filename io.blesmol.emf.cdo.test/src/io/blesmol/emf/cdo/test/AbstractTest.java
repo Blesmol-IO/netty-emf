@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.emf.cdo.server.IRepository.Props;
 import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -126,6 +127,7 @@ public abstract class AbstractTest {
 
 	protected Configuration configureForServer(Map<String, Object> properties) throws Exception {
 		configureForServerOrClient(properties);
+		properties.put(Props.OVERRIDE_UUID, "");
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IAcceptor.PID, properties);
 		return serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.CdoServer.PID, properties);
 	}

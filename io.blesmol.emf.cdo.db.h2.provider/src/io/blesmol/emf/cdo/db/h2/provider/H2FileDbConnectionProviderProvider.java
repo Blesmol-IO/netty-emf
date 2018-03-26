@@ -23,7 +23,7 @@ public class H2FileDbConnectionProviderProvider extends H2FileDbConnectionProvid
 	}
 	
 	@Activate
-	void activate(BundleContext context, CdoApi.IDBConnectionProvider config) {
+	void activate(BundleContext context, CdoApi.IDBConnectionProvider config) throws Exception {
 		super.activate(config.emf_cdo_connectionprovider_url());
 	}
 }

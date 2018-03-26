@@ -36,9 +36,7 @@ public class CdoResourceFactoryProviderTest extends AbstractTest {
 				Optional.of(resourceFactoryFilter), 1000);
 		assertNotNull(resourceFactoryRegistry);
 
-		Object cdoFactory = resourceFactoryRegistry.getProtocolToFactoryMap().get("cdo");
-		assertNotNull(cdoFactory);
-		cdoFactory = resourceFactoryRegistry.getProtocolToFactoryMap().get("cdo.net4j.jvm");
+		Object cdoFactory = resourceFactoryRegistry.getProtocolToFactoryMap().get("cdo.net4j.jvm");
 		assertNotNull(cdoFactory);
 
 	}

@@ -14,7 +14,7 @@ import org.osgi.service.log.LogService;
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.impl.DelegatedContainer;
 
-@Component(configurationPid = CdoApi.IManagedContainer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IManagedContainer.class)
+@Component(configurationPid = CdoApi.IManagedContainer.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = IManagedContainer.class, immediate=true)
 public class DelegatedContainerProvider extends DelegatedContainer {
 
 	private String servicePid;

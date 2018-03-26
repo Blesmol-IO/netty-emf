@@ -13,6 +13,7 @@ import org.eclipse.net4j.util.container.IManagedContainer;
 import org.eclipse.net4j.util.event.IListener;
 import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 
+@Deprecated
 public class DelegatedConnector implements IConnector {
 
 	protected IManagedContainer container;
