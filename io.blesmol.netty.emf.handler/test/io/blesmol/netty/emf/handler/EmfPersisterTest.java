@@ -7,8 +7,10 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.junit.Test;
 
+import io.blesmol.emf.test.util.EmfTestUtils;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 
 public class EmfPersisterTest {
@@ -40,7 +42,7 @@ public class EmfPersisterTest {
 		String msgPrefix = "messagePackage";
 		String msgUri = "blesmol://test/message";
 
-		final EObject expected = emfTestUtils.eObject(msgClassName, msgAttrName, msgPackage, msgPrefix, msgUri);
+		final EObject expected = emfTestUtils.eObject(msgClassName, msgAttrName, EcorePackage.Literals.EOBJECT, msgPackage, msgPrefix, msgUri);
 		persister.eSet(expected);		
 
 		// Hack. Consider decrementing some countdown latch, maybe via an adapter, when

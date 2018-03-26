@@ -1,5 +1,6 @@
 package io.blesmol.emf.provider;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +17,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.Resource_Factory_Registry.PID, configurationPolicy=ConfigurationPolicy.REQUIRE, service = Factory.Registry.class)
+@Component(configurationPid = EmfApi.Resource_Factory_Registry.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Factory.Registry.class, immediate = true)
 public class ResourceFactoryRegistryProvider extends ResourceFactoryRegistryImpl {
 
 	private volatile URIConverter converter;
@@ -36,34 +37,44 @@ public class ResourceFactoryRegistryProvider extends ResourceFactoryRegistryImpl
 		this.converter = null;
 	}
 
+	void putOrRemoveIntoFactoryMap(boolean put, Map<String, Object> properties, String apiName,
+			Map<String, Object> factoryMap, Object factoryDescriptor) {
+		Optional.ofNullable((String[]) properties.get(apiName))
+				.ifPresent(array -> Arrays.stream(array).forEach((key) -> {
+					if (put)
+						factoryMap.put(key, factoryDescriptor);
+					else
+						factoryMap.remove(key, factoryDescriptor);
+				}));
+	}
+
 	@Reference(name = EmfApi.Resource_Factory_Registry.Reference.RESOURCE_FACTORIES, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MULTIPLE)
 	void setFactory(Factory factory, Map<String, Object> properties) {
-		get(properties, EmfApi.SCHEME).ifPresent(s -> protocolToFactoryMap.put(s, factory));
-		get(properties, EmfApi.EXTENSION).ifPresent(s -> extensionToFactoryMap.put(s, factory));
-		get(properties, EmfApi.CONTENT_TYPE).ifPresent(s -> contentTypeIdentifierToFactoryMap.put(s, factory));
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.SCHEME, protocolToFactoryMap, factory);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.EXTENSION, extensionToFactoryMap, factory);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.CONTENT_TYPE, contentTypeIdentifierToFactoryMap, factory);
 	}
 
 	void unsetFactory(Factory factory, Map<String, Object> properties) {
-		get(properties, EmfApi.SCHEME).ifPresent(s -> protocolToFactoryMap.remove(s, factory));
-		get(properties, EmfApi.EXTENSION).ifPresent(s -> extensionToFactoryMap.remove(s, factory));
-		get(properties, EmfApi.CONTENT_TYPE).ifPresent(s -> contentTypeIdentifierToFactoryMap.remove(s, factory));
+		putOrRemoveIntoFactoryMap(false, properties, EmfApi.SCHEME, protocolToFactoryMap, factory);
+		putOrRemoveIntoFactoryMap(false, properties, EmfApi.EXTENSION, extensionToFactoryMap, factory);
+		putOrRemoveIntoFactoryMap(false, properties, EmfApi.CONTENT_TYPE, contentTypeIdentifierToFactoryMap, factory);
 	}
 
+	// TODO: consider removing and targeting a reference with appropriate object
+	// classes Factory & Factory.Descriptor
 	@Reference(name = EmfApi.Resource_Factory_Registry.Reference.RESOURCE_FACTORY_DESCRIPTORS, policy = ReferencePolicy.DYNAMIC, policyOption = ReferencePolicyOption.GREEDY, cardinality = ReferenceCardinality.MULTIPLE)
 	void setDescriptor(Factory.Descriptor descriptor, Map<String, Object> properties) {
-		get(properties, EmfApi.SCHEME).ifPresent(s -> protocolToFactoryMap.put(s, descriptor));
-		get(properties, EmfApi.EXTENSION).ifPresent(s -> extensionToFactoryMap.put(s, descriptor));
-		get(properties, EmfApi.CONTENT_TYPE).ifPresent(s -> contentTypeIdentifierToFactoryMap.put(s, descriptor));
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.SCHEME, protocolToFactoryMap, descriptor);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.EXTENSION, extensionToFactoryMap, descriptor);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.CONTENT_TYPE, contentTypeIdentifierToFactoryMap, descriptor);
+
 	}
 
 	void unsetDescriptor(Factory.Descriptor descriptor, Map<String, Object> properties) {
-		get(properties, EmfApi.SCHEME).ifPresent(s -> protocolToFactoryMap.remove(s, descriptor));
-		get(properties, EmfApi.EXTENSION).ifPresent(s -> extensionToFactoryMap.remove(s, descriptor));
-		get(properties, EmfApi.CONTENT_TYPE).ifPresent(s -> contentTypeIdentifierToFactoryMap.remove(s, descriptor));
-	}
-
-	Optional<String> get(Map<String, Object> properties, String key) {
-		return Optional.ofNullable((String) properties.get(key));
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.SCHEME, protocolToFactoryMap, descriptor);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.EXTENSION, extensionToFactoryMap, descriptor);
+		putOrRemoveIntoFactoryMap(true, properties, EmfApi.CONTENT_TYPE, contentTypeIdentifierToFactoryMap, descriptor);
 	}
 
 	@Override

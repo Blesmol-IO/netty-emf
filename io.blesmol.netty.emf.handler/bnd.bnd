@@ -14,10 +14,11 @@
 
 -testpath: \
 	${junit},\
-	slf4j.simple;version=1.7
+	slf4j.simple;version=1.7,\
+	io.blesmol.emf.test;version=latest
 
 javac.source: 1.8
 javac.target: 1.8
 
-Bundle-Version: 0.0.0.${tstamp}
+Bundle-Version: 0.1.0.${tstamp}
 Private-Package: io.blesmol.netty.emf.handler

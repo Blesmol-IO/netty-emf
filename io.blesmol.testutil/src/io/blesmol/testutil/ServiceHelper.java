@@ -53,6 +53,8 @@ public class ServiceHelper {
 				System.err.println(e);
 			}
 		});
+		configurations.clear();
+		this.configAdmin = null;
 	}
 
 	public <S> void registerService(BundleContext context, Class<S> serviceClass, S service,

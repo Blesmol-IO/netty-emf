@@ -21,7 +21,8 @@ import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
-@Component(configurationPid = EmfApi.Resource.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Resource.class)
+@Deprecated
+@Component(configurationPid = EmfApi.Resource.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Resource.class, immediate=true)
 public class ResourceProvider implements Resource {
 
 	Resource delegate;
@@ -47,6 +48,7 @@ public class ResourceProvider implements Resource {
 				delegate = resourceSet.getResource(uri, true);
 				logger.log(LogService.LOG_DEBUG, String.format("Obtained a resource via the URI %s.", uri.toString()));
 			} catch (Exception e) {
+				logger.log(LogService.LOG_DEBUG, String.format("Could not obtain resource via URI %s, cause: %s", uri.toString(), e));
 				_loadOnDemand = false;
 			}
 		}

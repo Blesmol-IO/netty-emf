@@ -25,6 +25,7 @@ import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
+@SuppressWarnings({"deprecation"})
 public class ProviderIntegrationTest {
 
 	@Rule
@@ -53,7 +54,7 @@ public class ProviderIntegrationTest {
 		};
 
 		final ResourceFactoryRegistryProvider resourceFactoryRegistry = new ResourceFactoryRegistryProvider();
-		properties.put(EmfApi.CONTENT_TYPE, Resource.Factory.Registry.DEFAULT_CONTENT_TYPE_IDENTIFIER);
+		properties.put(EmfApi.CONTENT_TYPE, new String[] { Resource.Factory.Registry.DEFAULT_CONTENT_TYPE_IDENTIFIER });
 		resourceFactoryRegistry.setFactory(resourceFactory, properties);
 		resourceFactoryRegistry.setURIConverter(uriConverter);
 		rs.setResourceFactoryRegistry(resourceFactoryRegistry);
@@ -103,8 +104,8 @@ public class ProviderIntegrationTest {
 
 		Resource resource = rs.getResource(logicalUri, false);
 		assertEquals(resourceProvider.delegate, resource);
-		
-		// 
+
+		//
 		EObject eObject = ePackage.getEFactoryInstance().create(eClass);
 		resource.getContents().add(eObject);
 		resource.save(null);
