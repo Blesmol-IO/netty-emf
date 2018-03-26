@@ -24,6 +24,7 @@ import org.junit.rules.TemporaryFolder;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 
+@SuppressWarnings("deprecation")
 public class DelegatedConnectorProviderTest {
 
 	// org.eclipse.net4j.internal.tcp.ssl.SSLProperties

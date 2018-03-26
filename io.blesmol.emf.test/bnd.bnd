@@ -30,12 +30,10 @@ javac.target: 1.8
 	io.blesmol.emf.test;version=snapshot,\
 	net.bytebuddy.byte-buddy;version='[1.7.10,1.7.11)',\
 	net.bytebuddy.byte-buddy-agent;version='[1.7.10,1.7.11)',\
-	org.apache.felix.configadmin;version='[1.8.16,1.8.17)',\
 	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)',\
 	org.apache.felix.gogo.runtime;version='[1.0.10,1.0.11)',\
 	org.apache.felix.gogo.shell;version='[1.0.0,1.0.1)',\
 	org.apache.felix.scr;version='[2.0.10,2.0.11)',\
-	org.apache.felix.scr;version='[2.0.14,2.0.15)',\
 	org.apache.servicemix.bundles.junit;version='[4.12.0,4.12.1)',\
 	org.eclipse.emf.common;version='[2.13.0,2.13.1)',\
 	org.eclipse.emf.ecore;version='[2.13.0,2.13.1)',\
@@ -44,7 +42,10 @@ javac.target: 1.8
 	org.objenesis;version='[2.6.0,2.6.1)',\
 	org.ops4j.pax.logging.pax-logging-api;version='[1.10.1,1.10.2)',\
 	org.ops4j.pax.logging.pax-logging-service;version='[1.10.1,1.10.2)',\
-	io.blesmol.testutil;version=snapshot
+	io.blesmol.testutil;version=snapshot,\
+	io.blesmol.emf.api;version=snapshot,\
+	org.eclipse.osgi.services;version='[3.6.0,3.6.1)',\
+	org.apache.felix.configadmin;version='[1.8.16,1.8.17)'
 
 Bundle-Version: 0.1.0.${tstamp}
 Private-Package: io.blesmol.emf.test
@@ -53,10 +54,11 @@ Private-Package: io.blesmol.emf.test
 -runsystempackages.objenesis: sun.misc,sun.reflect
 
 # Use Felix by default
--runfw: org.apache.felix.framework;version=5
+-runfw: org.eclipse.osgi;version='[3.12.100.v20180210-1608,3.12.100.v20180210-1608]'
 -runvm: -ea
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=io.blesmol.emf.test)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
 	osgi.identity;filter:='(&(osgi.identity=org.ops4j.pax.logging.pax-logging-service)(version>=1.10.1))',\
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.gogo.command)(version>=1.0.2))',\
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.gogo.runtime)(version>=1.0.10))',\

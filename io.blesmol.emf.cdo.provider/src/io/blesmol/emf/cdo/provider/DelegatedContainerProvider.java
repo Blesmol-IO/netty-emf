@@ -32,6 +32,7 @@ public class DelegatedContainerProvider extends DelegatedContainer {
 	// Use a config to avoid overriding super
 	@Deactivate
 	void deactivate(CdoApi.IManagedContainer config) {
+		logger.log(LogService.LOG_DEBUG, "Deactivating " + this);
 		super.deactivate();
 	}
 

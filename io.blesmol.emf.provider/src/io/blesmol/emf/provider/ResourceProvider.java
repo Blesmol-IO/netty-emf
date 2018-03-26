@@ -21,6 +21,7 @@ import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.api.EmfApi;
 
+@Deprecated
 @Component(configurationPid = EmfApi.Resource.PID, configurationPolicy = ConfigurationPolicy.REQUIRE, service = Resource.class, immediate=true)
 public class ResourceProvider implements Resource {
 

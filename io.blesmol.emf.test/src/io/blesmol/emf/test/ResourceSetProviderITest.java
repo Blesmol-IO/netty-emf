@@ -52,7 +52,7 @@ public class ResourceSetProviderITest {
 				return new BinaryResourceImpl(uri);
 			}
 		};
-		properties.put(EmfApi.CONTENT_TYPE, Resource.Factory.Registry.DEFAULT_CONTENT_TYPE_IDENTIFIER);
+		properties.put(EmfApi.CONTENT_TYPE, new String[] { Resource.Factory.Registry.DEFAULT_CONTENT_TYPE_IDENTIFIER });
 		serviceHelper.registerService(context, Resource.Factory.class, factory, properties);
 		return factory;
 	}
@@ -100,8 +100,8 @@ public class ResourceSetProviderITest {
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.EPackage_Registry.PID,
 				Collections.emptyMap());
 		final EPackage expectedPackage = createAndRegisterEPackage();
-		EPackage.Registry ePackageRegistry = serviceHelper.getService(context, EPackage.Registry.class, Optional.empty(),
-				250);
+		EPackage.Registry ePackageRegistry = serviceHelper.getService(context, EPackage.Registry.class,
+				Optional.empty(), 250);
 		assertNotNull(ePackageRegistry);
 		EPackage actualPackage = ePackageRegistry.getEPackage(expectedPackage.getNsURI());
 		assertEquals(expectedPackage.getName(), actualPackage.getName());
@@ -123,7 +123,8 @@ public class ResourceSetProviderITest {
 				Collections.emptyMap());
 		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.EPackage_Registry.PID,
 				Collections.emptyMap());
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.ResourceSet.PID, Collections.emptyMap());
+		serviceHelper.createFactoryConfiguration(context, Optional.empty(), EmfApi.ResourceSet.PID,
+				Collections.emptyMap());
 
 		// Prep
 		final EPackage ePackage = createAndRegisterEPackage();
