@@ -6,10 +6,14 @@ import java.util.concurrent.CountDownLatch;
 
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 
 public class CdoOsgiTestUtils {
+	
+	protected static final Logger logger = LoggerFactory.getLogger(CdoOsgiTestUtils.class);
 
 	public static final String H2_SUFFIX = ".mv.db";
 
@@ -17,14 +21,15 @@ public class CdoOsgiTestUtils {
 	
 	public String cleanH2FileUrl(File file) throws Exception {
 		String results = file.toURI().toURL().toString();
+		logger.debug("Removing suffix: {}", results);
 		results = results.substring(0, results.indexOf(H2_SUFFIX));
+		logger.debug("Removed suffix: {}", results);
 		return results;
 	}
 
 	public void putMinimalProperties(Map<String, Object> properties, String repoName, String description, String type, String fileUrl) {
 		properties.put("emf.cdo.connector.description", description);
 		properties.put("emf.cdo.acceptor.description", description);
-		// Is this correct? Description for TCP will be host:port
 		properties.put("blesmol.cdoserver.reponame", repoName);
 		properties.put("emf.cdo.managedcontainer.type", type);
 		properties.put("emf.cdo.connector.type", type);
@@ -34,8 +39,6 @@ public class CdoOsgiTestUtils {
 
 	public void putEmfProperties(Map<String, Object> properties, String uri) {
 		properties.put("emf.uri", uri);
-//		properties.put(EmfApi.SCHEME, new String[]{"cdo", "cdo.net4j.jvm", "cdo.net4j.tcp", "cdo.net4j.ssl"});
-
 	}
 
 	public void putTargets(Map<String, Object> properties, String targetValue) {
@@ -44,11 +47,11 @@ public class CdoOsgiTestUtils {
 		properties.put(TARGET_KEY, targetValue);
 		properties.put(CdoApi.IDBConnectionProvider.Reference.DB_ADAPTER + suffix, target);
 		properties.put(CdoApi.IAcceptor.Reference.MANAGED_CONTAINER + suffix, target);
-		properties.put(CdoApi.IConnector.Reference.MANAGED_CONTAINER + suffix, target);
 		properties.put(CdoApi.CdoServer.Reference.MANAGED_CONTAINER + suffix, target);
 		properties.put(CdoApi.CdoServer.Reference.ACCEPTOR + suffix, target);
 		properties.put(CdoApi.CdoServer.Reference.DB_ADAPTER + suffix, target);
 		properties.put(CdoApi.CdoServer.Reference.DB_CONNECTION_PROVIDER + suffix, target);
+		properties.put(CdoApi.CdoViewProvider.Reference.CONTAINER + suffix, target);
 	}
 
 	public static class LatchServiceListener implements ServiceListener {

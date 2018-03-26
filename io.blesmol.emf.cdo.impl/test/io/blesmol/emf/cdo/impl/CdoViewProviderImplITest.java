@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.net4j.util.container.IManagedContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -32,32 +32,34 @@ import io.blesmol.emf.test.util.EmfTestUtils;
 
 public class CdoViewProviderImplITest {
 
+	public static final String H2_SUFFIX = ".mv.db";
 	private EmfTestUtils emfTestUtils = new EmfTestUtils();
 	private ImplCdoTestUtils cdoTestUtils = new ImplCdoTestUtils();
 	private static final String REPO_NAME = CdoViewProviderImplITest.class.getSimpleName();
 	private static final Map<String, String> REPO_PROPS = new HashMap<>();
 
-	private volatile CdoViewProviderImpl viewProvider;
-	private volatile CdoServerImpl cdoServer;
+	private CdoViewProviderImpl viewProvider;
+	private CdoServerImpl cdoServer;
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
 	@BeforeClass
 	public static void beforeClass() {
-		REPO_PROPS.put(Props.OVERRIDE_UUID, REPO_NAME);
+		REPO_PROPS.put(Props.OVERRIDE_UUID, "");
 	}
 
 	@Before
 	public void before() throws Exception {
+		IManagedContainer container = cdoTestUtils.container("jvm");
 		viewProvider = new CdoViewProviderImpl();
-		viewProvider.container = cdoTestUtils.jvmClientContainer();
+		viewProvider.container = cdoTestUtils.clientContainer(container);
 		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
 		viewProvider.setPriority(1000);
 		viewProvider.activate();
 
-		File tempFile = tempFolder.newFile(REPO_NAME);
-		cdoServer = cdoTestUtils.server(tempFile, REPO_NAME, true, true, false, REPO_PROPS);
+		cdoServer = cdoTestUtils.server(cdoTestUtils.serverContainer(container),
+				cdoTestUtils.repoFile(tempFolder, REPO_NAME), REPO_NAME, true, true, false, REPO_PROPS);
 	}
 
 	@After
@@ -67,7 +69,7 @@ public class CdoViewProviderImplITest {
 		cdoServer.dbAdapter = null;
 		cdoServer.connectionProvider = null;
 		cdoServer.acceptor = null;
-		cdoServer.container.deactivate();
+		// cdoServer.container.deactivate();
 		cdoServer.deactivate();
 		viewProvider = null;
 		cdoServer = null;
@@ -88,13 +90,17 @@ public class CdoViewProviderImplITest {
 		resource.getContents().add(expectedEObject);
 		resource.save(null);
 
+		after();
 		rs = null;
 		resource = null;
+		before();
+
 		rs = cdoTestUtils.createAndPrepResourceSet(ImplCdoTestUtils.SCHEMA_JVM);
 		resource = rs.getResource(uri, true);
 		Object object = resource.getContents().get(0);
 		assertTrue(object instanceof EObject);
 		emfTestUtils.assertEObjects(expectedEObject, (EObject) object);
+		tempFolder.delete();
 	}
 
 	@Test

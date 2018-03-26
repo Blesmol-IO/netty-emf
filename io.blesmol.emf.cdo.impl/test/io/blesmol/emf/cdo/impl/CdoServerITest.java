@@ -2,7 +2,6 @@ package io.blesmol.emf.cdo.impl;
 
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,12 +12,11 @@ import org.eclipse.emf.cdo.net4j.CDONet4jUtil;
 import org.eclipse.emf.cdo.server.IRepository.Props;
 import org.eclipse.emf.cdo.transaction.CDOTransaction;
 import org.eclipse.net4j.connector.IConnector;
+import org.eclipse.net4j.util.container.IManagedContainer;
 import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import io.blesmol.emf.cdo.impl.CdoServerImpl;
 
 public class CdoServerITest {
 
@@ -32,10 +30,10 @@ public class CdoServerITest {
 
 		// Setup server
 		String repoName = getClass().getSimpleName();
-		File tempFile = tempFolder.newFile(repoName);
 		Map<String, String> repoProps = new HashMap<>();
-		repoProps.put(Props.OVERRIDE_UUID, repoName);
-		CdoServerImpl cdoServer = cdoTestUtils.server(tempFile, repoName, true, true, false, repoProps);
+		repoProps.put(Props.OVERRIDE_UUID, "");
+		IManagedContainer container = cdoTestUtils.container("jvm");
+		CdoServerImpl cdoServer = cdoTestUtils.server(cdoTestUtils.serverContainer(container), cdoTestUtils.repoFile(tempFolder, repoName), repoName, true, true, false, repoProps);
 
 		// setup client
 		IConnector connector = cdoTestUtils.getJvmConnector(cdoServer.container, repoName);

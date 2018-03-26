@@ -5,12 +5,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.sql.DataSource;
 
 import org.eclipse.emf.cdo.server.IRepository.Props;
 import org.eclipse.emf.common.util.URI;
@@ -18,12 +15,14 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.net4j.db.IDBAdapter;
-import org.eclipse.net4j.util.container.IManagedContainer;
-import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
+import org.osgi.service.log.LogService;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.cdo.test.util.CdoTestUtils;
@@ -32,50 +31,62 @@ import io.blesmol.emf.test.util.EmfTestUtils;
 public class CdoViewProviderProviderTest {
 
 	private EmfTestUtils emfTestUtils = new EmfTestUtils();
-	private CdoTestUtils cdoTestUtils = new CdoTestUtils();
+	private ProviderCdoTestUtils cdoTestUtils = new ProviderCdoTestUtils();
+
+	private CdoViewProviderProvider viewProvider;
+	private CdoServerProvider cdoServer;
+	private DelegatedContainerProvider container;
+
+	private final String repoName = getClass().getSimpleName();
+	private static final Map<String, Object> REPO_PROPS = new HashMap<>();
+	private static final CdoApi.CdoServer serverConfig = mock(CdoApi.CdoServer.class);
+	private static final CdoApi.CdoViewProvider viewConfig = mock(CdoApi.CdoViewProvider.class);
+
+	@BeforeClass
+	public static void beforeClass() {
+		REPO_PROPS.put(Props.OVERRIDE_UUID, "");
+	}
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
+	@Before
+	public void before() throws Exception {
+		container = (DelegatedContainerProvider) cdoTestUtils.container("jvm");
+
+		when(viewConfig.blesmol_cdoviewprovider_regex()).thenReturn(CdoApi.CdoViewProvider.REGEX);
+		when(viewConfig.blesmol_cdoviewprovider_priority()).thenReturn(1000);
+		when(serverConfig.blesmol_cdoserver_reponame()).thenReturn(repoName);
+		viewProvider = new CdoViewProviderProvider();
+		viewProvider.setContainer(cdoTestUtils.clientContainer(container));
+		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
+		viewProvider.setPriority(1000);
+		viewProvider.logger = Mockito.mock(LogService.class);
+		viewProvider.activate(viewConfig, Collections.emptyMap());
+
+		cdoServer = cdoTestUtils.server(serverConfig, cdoTestUtils.serverContainer(container),
+				cdoTestUtils.repoFile(tempFolder, repoName), repoName, true, true, false, REPO_PROPS);
+	}
+
+	@After
+	public void after() {
+		container.deactivate(null);
+		viewProvider.deactivate();
+		cdoServer.unsetDbAdapter(null);
+		cdoServer.unsetDbConnectionProvider(null);
+		cdoServer.unsetAcceptor(null);
+		cdoServer.deactivate();
+		viewProvider = null;
+		cdoServer = null;
+	}
+
 	/**
 	 * FIXME: most of this is copy pasta
 	 * 
-	 * @see io.blesmol.emf.cdo.impl.CdoViewProviderImplITest#shouldSaveGetEObjectTransparentlyViaViewProvider() 
+	 * @see io.blesmol.emf.cdo.impl.CdoViewProviderImplITest#shouldSaveGetEObjectTransparentlyViaViewProvider()
 	 */
 	@Test
 	public void shouldSaveGetEObjectTransparentlyViaViewProvider() throws Exception {
-		String repoName = getClass().getSimpleName();
-		File tempFile = tempFolder.newFile(repoName);
-
-		// Mock server configs
-		CdoApi.CdoServer config = mock(CdoApi.CdoServer.class);
-		when(config.blesmol_cdoserver_reponame()).thenReturn(repoName);
-		Map<String, Object> props = new HashMap<>();
-		props.put(Props.OVERRIDE_UUID, repoName);
-
-		// Create server
-		CdoServerProvider serverProvider = new CdoServerProvider();
-
-		IDBAdapter dbAdapter = cdoTestUtils.h2Adapter();
-		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
-
-		final IManagedContainer container = cdoTestUtils.serverContainer(true);
-		serverProvider.setDbConnectionProvider(dbAdapter.createConnectionProvider(dataSource));
-		serverProvider.setContainer(container);
-		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
-		serverProvider.setDbAdapter(dbAdapter);
-		serverProvider.activate(config, props);
-
-		// Mock view config
-		CdoApi.CdoViewProvider viewConfig = mock(CdoApi.CdoViewProvider.class);
-		when(viewConfig.blesmol_cdoviewprovider_regex()).thenReturn(CdoApi.CdoViewProvider.REGEX);
-		when(viewConfig.blesmol_cdoviewprovider_priority()).thenReturn(1000);
-
-		CdoViewProviderProvider viewProvider = new CdoViewProviderProvider();
-		viewProvider.setContainer(container);
-		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
-		viewProvider.setPriority(1000);
-		viewProvider.activate(viewConfig, Collections.emptyMap());
 
 		final String resourceName = "/test";
 		URI uri = URI.createURI(
@@ -91,39 +102,14 @@ public class CdoViewProviderProviderTest {
 
 		rs = null;
 		resource = null;
+		after();
+		before();
+
 		rs = cdoTestUtils.createAndPrepResourceSet(CdoTestUtils.SCHEMA_JVM);
 		resource = rs.getResource(uri, true);
 		Object object = resource.getContents().get(0);
 		assertTrue(object instanceof EObject);
 		emfTestUtils.assertEObjects(expectedEObject, (EObject) object);
-
-		// viewProvider.setContainer(container);
-		// viewProvider.activate(viewConfig, Collections.emptyMap());
-		//
-		// final URI uri = URI.createURI("cdo.net4j.jvm://%s/%s/" + repoName);
-		// final ResourceSet rs =
-		// cdoTestUtils.createAndPrepResourceSet(CdoTestUtils.SCHEMA_JVM);
-		// Resource resource = rs.createResource(uri);
-		// assertNotNull(resource);
-		//
-		// String expectedClassName = "TestObject";
-		// String expectedAttrName = "testAttribute";
-		// String expectedPackageName = "TestPackage";
-		// String expectedNsPrefix = "testPackage";
-		// String expectedNsUri = "test://someTest/package";
-		//
-		// final EObject expectedEObject = emfTestUtils.eObject(expectedClassName,
-		// expectedAttrName,
-		// EcorePackage.Literals.ESTRING, expectedPackageName, expectedNsPrefix,
-		// expectedNsUri);
-		// resource.getContents().add(expectedEObject);
-		// resource.save(null);
-		//
-		//
-		// // Clean up
-		// LifecycleUtil.deactivate(tx);
-		LifecycleUtil.deactivate(viewProvider);
-		serverProvider.deactivate();
 
 	}
 

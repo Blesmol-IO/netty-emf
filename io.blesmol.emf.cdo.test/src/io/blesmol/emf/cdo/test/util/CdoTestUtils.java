@@ -1,6 +1,9 @@
 package io.blesmol.emf.cdo.test.util;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.sql.DataSource;
 
@@ -20,11 +23,18 @@ import org.eclipse.net4j.jvm.JVMUtil;
 import org.eclipse.net4j.util.container.ContainerUtil;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.h2.jdbcx.JdbcDataSource;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CdoTestUtils {
 
-	public static final String SCHEMA_JVM = "cdo.net4j.jvm";
+	protected static final Logger logger = LoggerFactory.getLogger(CdoTestUtils.class);
 
+	public static final String SCHEMA_JVM = "cdo.net4j.jvm";
+	public static final String H2_SUFFIX = ".mv.db";
+
+	@Deprecated
 	public IManagedContainer serverContainer(boolean useJvm) {
 		IManagedContainer container = ContainerUtil.createContainer();
 
@@ -37,6 +47,7 @@ public class CdoTestUtils {
 		return container;
 	}
 
+	@Deprecated
 	public IManagedContainer jvmClientContainer() {
 		IManagedContainer container = ContainerUtil.createContainer();
 
@@ -58,13 +69,27 @@ public class CdoTestUtils {
 		return JVMUtil.getConnector(container, repoName);
 	}
 
+	public File repoFile(TemporaryFolder tempFolder, String repoName) throws Exception {
+		String repoFileName = repoName + H2_SUFFIX;
+		Path repoPath = Paths.get(tempFolder.getRoot().getAbsolutePath(), repoFileName);
+		File repoFile;
+		if (!Files.exists(repoPath)) {
+			repoFile = tempFolder.newFile(repoFileName);
+		} else {
+			repoFile = repoPath.toFile();
+		}
+		return repoFile;
+	}
+	
 	public DataSource dataSource(File file, String repoName) throws Exception {
-		// Don't use memory since the schema is written and a new data source is made
-		final String dbUri = "jdbc:h2:" + file.toURI().toURL().toString(); // getAbsolutePath();
-		JdbcDataSource dataSource = new JdbcDataSource();
-		dataSource.setUrl(dbUri);
-		H2Adapter.createSchema(dataSource, repoName, true);
-		// dataSource = new JdbcDataSource();
+		final String fileUrl = cleanH2FileUrl(file);
+		final String dbUri = "jdbc:h2:" + fileUrl;
+		final JdbcDataSource dataSource = new JdbcDataSource();
+		if (file.length() == 0) {
+			logger.debug("Creating new schema for dbUri {} and repository {}", dbUri, file.getAbsolutePath());
+			dataSource.setUrl(dbUri);
+			H2Adapter.createSchema(dataSource, repoName, true);
+		}
 		dataSource.setURL(dbUri + ";SCHEMA=" + repoName);
 		return dataSource;
 	}
@@ -82,4 +107,23 @@ public class CdoTestUtils {
 		return rs;
 	}
 
+	public String cleanH2FileUrl(File file) throws Exception {
+		String results = file.toURI().toURL().toString();
+		results = results.substring(0, results.indexOf(H2_SUFFIX));
+		return results;
+	}
+
+	public IManagedContainer serverContainer(IManagedContainer container) {
+		CDONet4jServerUtil.prepareContainer(container); // Register CDO server factories
+		return container;
+	}
+
+	public IManagedContainer clientContainer(IManagedContainer container) {
+		CDONet4jUtil.prepareContainer(container); // Register CDO client factories
+		return container;
+	}
+	
+	public IManagedContainer container(String type) {
+		throw new UnsupportedOperationException("Needs to be implemented");
+	}
 }

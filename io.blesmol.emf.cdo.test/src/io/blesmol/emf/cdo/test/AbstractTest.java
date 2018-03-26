@@ -27,6 +27,8 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.blesmol.emf.api.EmfApi;
 import io.blesmol.emf.cdo.api.CdoApi;
@@ -34,6 +36,8 @@ import io.blesmol.testutil.ServiceHelper;
 
 public abstract class AbstractTest {
 
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractTest.class);
+	
 	protected static final String CDO_PROVIDER_BUNDLE = "io.blesmol.emf.cdo.provider";
 
 	protected static final String VIEW_PROVIDER_TYPE = "io.blesmol.emf.cdo.provider.CdoViewProviderProvider";
@@ -130,14 +134,14 @@ public abstract class AbstractTest {
 		configureForServer(properties);
 
 		// Client
-		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IConnector.PID, properties);
+//		serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.IConnector.PID, properties);
 		return serviceHelper.createFactoryConfiguration(context, Optional.empty(), CdoApi.CdoViewProvider.PID,
 				properties);
 	}
 
 	protected void verify(CountDownLatch latch, Configuration configuration, String providerBundle, String providerType)
 			throws Exception {
-		assertTrue(latch.await(3000, TimeUnit.MILLISECONDS));
+		assertTrue(latch.await(4000, TimeUnit.MILLISECONDS));
 		Thread.sleep(2000);
 
 		// Obtain the SCR and observe our CdoServer's configured component
@@ -179,11 +183,13 @@ public abstract class AbstractTest {
 		File repoFile;
 		if (!Files.exists(repoPath)) {
 			repoFile = tempFolder.newFile(repoFileName);
+			logger.debug("Making new repository {}", repoFile.getAbsolutePath());
 		} else {
 			repoFile = repoPath.toFile();
+			logger.debug("Opening repository {}", repoFile.getAbsolutePath());
 		}
 
-		// Synchronize to when the CdoViewProvider is registered
+		// Synchronize to the latchTo type
 		addLatchListener(latch, latchTo);
 
 		// Prep
@@ -195,6 +201,7 @@ public abstract class AbstractTest {
 		if (includeClient && ssl) {
 			final String password = "tooManySecrets";
 			// And set CDO SSL properties (cleared in @After)
+			// TODO: reload previously created key stores
 			System.setProperty(TRUST_PATH, createKeyStore(tempFolder, "truststore", password));
 			System.setProperty(KEY_PATH, createKeyStore(tempFolder, "keystore", password));
 			System.setProperty(CHECK_VALIDITY_CERTIFICATE, "false");

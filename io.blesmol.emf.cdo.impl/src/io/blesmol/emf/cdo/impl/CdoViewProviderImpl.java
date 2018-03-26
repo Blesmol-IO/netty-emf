@@ -31,6 +31,7 @@ import io.blesmol.emf.cdo.api.CdoViewProvider;
  */
 public class CdoViewProviderImpl extends CDONet4jViewProvider implements CdoViewProvider {
 
+	// FIXME: this isn't sync'd to the regex passed in
 	protected static final Pattern transportPattern = Pattern.compile("(?:cdo\\.net4j\\.)(jvm|tcp|ssl)");
 
 	private static final String DUMMY_REGEX = "";

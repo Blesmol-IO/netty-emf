@@ -8,8 +8,12 @@ import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.db.IDBConnectionProvider;
 import org.eclipse.net4j.db.h2.H2Adapter;
 import org.h2.jdbcx.JdbcDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class H2FileDbConnectionProvider implements IDBConnectionProvider {
+
+	protected static final Logger logger = LoggerFactory.getLogger(IDBConnectionProvider.class);
 
 	protected IDBAdapter dbAdapter;
 	
@@ -25,6 +29,7 @@ public class H2FileDbConnectionProvider implements IDBConnectionProvider {
 		final File file = new File(fileUrl + "mv.db");
 		final JdbcDataSource dataSource = new JdbcDataSource();
 		if (file.length() == 0) {
+			logger.debug("Creating new schema for dbUri {} and repository at {}", dbUri, file.getAbsolutePath());
 			dataSource.setUrl(dbUri);
 			H2Adapter.createSchema(dataSource, repoName, true);
 		}

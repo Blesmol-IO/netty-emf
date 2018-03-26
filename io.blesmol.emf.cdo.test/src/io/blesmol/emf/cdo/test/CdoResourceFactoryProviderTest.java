@@ -28,7 +28,7 @@ public class CdoResourceFactoryProviderTest extends AbstractTest {
 	@Test
 	public void cdoShouldBeRegisteredInEmfResourceFactoryRegistry() throws Exception {
 		Map<String, Object> properties = new HashMap<>();
-		properties.put(EmfApi.SCHEME, new String[]{"cdo", "cdo.net4j.jvm"});
+		properties.put(EmfApi.SCHEME, new String[]{"cdo.net4j.jvm"});
 
 		Configuration resourceFactoryConfig = configureForResourceFactory(properties);
 		String resourceFactoryFilter = String.format("(%s=%s)", Constants.SERVICE_PID, resourceFactoryConfig.getPid());

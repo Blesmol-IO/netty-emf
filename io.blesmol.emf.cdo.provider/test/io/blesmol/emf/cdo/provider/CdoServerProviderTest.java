@@ -3,14 +3,10 @@ package io.blesmol.emf.cdo.provider;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import org.eclipse.emf.cdo.server.IRepository.Props;
-import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,26 +23,20 @@ public class CdoServerProviderTest {
 
 	@Test
 	public void shouldCreateServerProvider() throws Exception {
-		
+
+		// Prep
 		String repoName = getClass().getSimpleName();
-		CdoApi.CdoServer config = mock(CdoApi.CdoServer.class);
-		when(config.blesmol_cdoserver_reponame()).thenReturn(repoName);
-
-		File tempFile = tempFolder.newFile(repoName);
+		CdoApi.CdoServer serverConfig = mock(CdoApi.CdoServer.class);
+		when(serverConfig.blesmol_cdoserver_reponame()).thenReturn(repoName);
 		Map<String, Object> props = new HashMap<>();
-		props.put(Props.OVERRIDE_UUID, repoName);
+		props.put(Props.OVERRIDE_UUID, "");
+		final IManagedContainer container = cdoTestUtils.container("jvm");
 
-		DataSource dataSource = cdoTestUtils.dataSource(tempFile, repoName);
-		IDBAdapter dbAdapter = cdoTestUtils.h2Adapter();
-		CdoServerProvider serverProvider = new CdoServerProvider();
-		final IManagedContainer container = cdoTestUtils.serverContainer(true);		
-		serverProvider.setDbConnectionProvider(dbAdapter.createConnectionProvider(dataSource));
-		serverProvider.setContainer(container);
-		serverProvider.setAcceptor(cdoTestUtils.getJvmAcceptor(container, repoName));
-		serverProvider.setDbAdapter(dbAdapter);
-		
 		// Verify
-		serverProvider.activate(config, props);
+		CdoServerProvider serverProvider = cdoTestUtils.server(serverConfig, cdoTestUtils.serverContainer(container),
+				cdoTestUtils.repoFile(tempFolder, repoName), repoName, true, true, false, props);
+
+		// Clean up
 		serverProvider.deactivate();
 	}
 

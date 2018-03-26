@@ -44,6 +44,7 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.eclipse.emf.cdo.net4j;version=4.1,\
 	org.eclipse.emf.ecore.xmi;version=2.13,\
 	org.eclipse.emf.ecore.change;version=2.11,\
+	org.ops4j.pax.logging.pax-logging-api;version='[1.10.1,1.10.2)',\
 	org.h2;version=1.4
 
 javac.source: 1.8
