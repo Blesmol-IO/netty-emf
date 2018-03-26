@@ -20,12 +20,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.net4j.util.container.IManagedContainer;
-import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mockito;
 
 import io.blesmol.emf.cdo.api.CdoApi;
 import io.blesmol.emf.test.util.EmfTestUtils;
@@ -34,29 +34,52 @@ public class CdoViewProviderImplITest {
 
 	private EmfTestUtils emfTestUtils = new EmfTestUtils();
 	private ImplCdoTestUtils cdoTestUtils = new ImplCdoTestUtils();
+	private static final String REPO_NAME = CdoViewProviderImplITest.class.getSimpleName();
+	private static final Map<String, String> REPO_PROPS = new HashMap<>();
+
+	private volatile CdoViewProviderImpl viewProvider;
+	private volatile CdoServerImpl cdoServer;
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	@Test
-	public void shouldSaveGetEObjectTransparentlyViaViewProvider() throws Exception {
-		// Setup server
-		String repoName = getClass().getSimpleName();
-		File tempFile = tempFolder.newFile(repoName);
-		Map<String, String> repoProps = new HashMap<>();
-		repoProps.put(Props.OVERRIDE_UUID, repoName);
-		final CdoServerImpl cdoServer = cdoTestUtils.server(tempFile, repoName, true, true, false, repoProps);
+	@BeforeClass
+	public static void beforeClass() {
+		REPO_PROPS.put(Props.OVERRIDE_UUID, REPO_NAME);
+	}
 
-		// Setup view
-		final CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
+	@Before
+	public void before() throws Exception {
+		viewProvider = new CdoViewProviderImpl();
 		viewProvider.container = cdoTestUtils.jvmClientContainer();
 		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
 		viewProvider.setPriority(1000);
 		viewProvider.activate();
+
+		File tempFile = tempFolder.newFile(REPO_NAME);
+		cdoServer = cdoTestUtils.server(tempFile, REPO_NAME, true, true, false, REPO_PROPS);
+	}
+
+	@After
+	public void after() {
+		viewProvider.container.deactivate();
+		viewProvider.deactivate();
+		cdoServer.dbAdapter = null;
+		cdoServer.connectionProvider = null;
+		cdoServer.acceptor = null;
+		cdoServer.container.deactivate();
+		cdoServer.deactivate();
+		viewProvider = null;
+		cdoServer = null;
+	}
+
+	@Test
+	public void shouldSaveGetEObjectTransparentlyViaViewProvider() throws Exception {
 		final String resourceName = "/test";
 		URI uri = URI.createURI(
-				String.format("cdo.net4j.jvm://%s/%s/%s?transactional=true", repoName, repoName, resourceName));
+				String.format("cdo.net4j.jvm://%s/%s/%s?transactional=true", REPO_NAME, REPO_NAME, resourceName));
 		ResourceSet rs = cdoTestUtils.createAndPrepResourceSet(ImplCdoTestUtils.SCHEMA_JVM);
+
 		Resource resource = rs.createResource(uri);
 		assertNotNull(resource);
 
@@ -72,21 +95,11 @@ public class CdoViewProviderImplITest {
 		Object object = resource.getContents().get(0);
 		assertTrue(object instanceof EObject);
 		emfTestUtils.assertEObjects(expectedEObject, (EObject) object);
-
-		// Clean up
-		// LifecycleUtil.deactivate(tx);
-		LifecycleUtil.deactivate(viewProvider);
-		cdoServer.deactivate();
 	}
 
 	@Test
 	public void shouldContainViewProvider() throws Exception {
 
-		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
-		viewProvider.container = Mockito.mock(IManagedContainer.class);
-		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
-		viewProvider.setPriority(1000);
-		viewProvider.activate();
 		CDOViewProvider[] viewProviders = CDOViewProviderRegistry.INSTANCE
 				.getViewProviders(URI.createURI("cdo.net4j.jvm://notused/notused/notused/"));
 		assertNotNull(viewProviders);
@@ -94,22 +107,15 @@ public class CdoViewProviderImplITest {
 
 		// Throws exception if not found
 		Arrays.stream(viewProviders).filter(vp -> vp.toString().equals(viewProvider.toString())).findFirst().get();
-
-		LifecycleUtil.deactivate(viewProvider);
-
 	}
 
 	@Test
 	public void shouldMatchRegex() {
-		CdoViewProviderImpl impl = new CdoViewProviderImpl();
-		impl.setRegex(CdoApi.CdoViewProvider.REGEX);
-		assertEquals("jvm", impl.getTransport("cdo.net4j.jvm"));
+		assertEquals("jvm", viewProvider.getTransport("cdo.net4j.jvm"));
 	}
 
 	@Test
 	public void shouldHaveInvalidUri() {
-		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
-
 		// No resource
 		URI uri = URI.createURI("cdo://bob");
 		try {
@@ -117,19 +123,16 @@ public class CdoViewProviderImplITest {
 			fail();
 		} catch (InvalidURIException e) {
 		}
-
 		// Other tests?
 
 	}
 
 	@Test
 	public void shouldHaveValidUri() {
-
 		final String expectedRepoName = "repository";
 		final String expectedResourceName = "resource";
 		final String expectedAcceptorName = expectedRepoName; // "acceptor";
-		// cdo.net4j. ConnectorType :// [User [: Password] @] ConnectorSpecificAuthority
-		// / RepositoryName / ResourcePath
+
 		URI uri = URI.createURI(String.format("cdo.net4j.jvm://%s/%s/%s", expectedAcceptorName, expectedRepoName,
 				expectedResourceName));
 		CDOURIData uriData = new CDOURIData(uri);
@@ -137,14 +140,10 @@ public class CdoViewProviderImplITest {
 		assertEquals(expectedRepoName, uriData.getRepositoryName());
 		assertEquals(expectedResourceName, uriData.getResourcePath().toString());
 		assertEquals(expectedAcceptorName, uriData.getAuthority());
-
 	}
 
 	@Test
 	public void shouldSupportValidUriInRegex() {
-		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
-		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
-		viewProvider.setPriority(500);
 		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.jvm://notused")));
 		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.tcp://notused")));
 		assertTrue(viewProvider.matchesRegex(URI.createURI("cdo.net4j.ssl://notused")));
@@ -152,7 +151,6 @@ public class CdoViewProviderImplITest {
 
 	@Test
 	public void shouldParseConnectionAwareUriCorrectly() {
-
 		final String expectedRepoName = "repository";
 		final String expectedResourceName = "resource";
 		final String expectedAcceptorName = expectedRepoName; // "acceptor";
@@ -161,11 +159,6 @@ public class CdoViewProviderImplITest {
 		URI uri = URI.createURI(String.format("cdo.net4j.jvm://%s/%s/%s", expectedAcceptorName, expectedRepoName,
 				expectedResourceName));
 
-		CdoViewProviderImpl viewProvider = new CdoViewProviderImpl();
-		viewProvider.setRegex(CdoApi.CdoViewProvider.REGEX);
-		viewProvider.setPriority(1000);
-
 		assertEquals(String.format("%s", expectedResourceName), viewProvider.getPath(uri));
-
 	}
 }

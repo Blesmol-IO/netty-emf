@@ -12,15 +12,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.eclipse.emf.cdo.eresource.CDOResource;
 import org.eclipse.emf.cdo.server.IRepository.Props;
-import org.eclipse.emf.cdo.transaction.CDOTransaction;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.net4j.db.IDBAdapter;
 import org.eclipse.net4j.util.container.IManagedContainer;
 import org.eclipse.net4j.util.lifecycle.LifecycleUtil;
@@ -29,13 +26,13 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import io.blesmol.emf.cdo.api.CdoApi;
-import io.blesmol.emf.cdo.impl.ImplCdoTestUtils;
+import io.blesmol.emf.cdo.test.util.CdoTestUtils;
 import io.blesmol.emf.test.util.EmfTestUtils;
 
 public class CdoViewProviderProviderTest {
 
 	private EmfTestUtils emfTestUtils = new EmfTestUtils();
-	private ImplCdoTestUtils cdoTestUtils = new ImplCdoTestUtils();
+	private CdoTestUtils cdoTestUtils = new CdoTestUtils();
 
 	@Rule
 	public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -83,7 +80,7 @@ public class CdoViewProviderProviderTest {
 		final String resourceName = "/test";
 		URI uri = URI.createURI(
 				String.format("cdo.net4j.jvm://%s/%s/%s?transactional=true", repoName, repoName, resourceName));
-		ResourceSet rs = cdoTestUtils.createAndPrepResourceSet(ImplCdoTestUtils.SCHEMA_JVM);
+		ResourceSet rs = cdoTestUtils.createAndPrepResourceSet(CdoTestUtils.SCHEMA_JVM);
 		Resource resource = rs.createResource(uri);
 		assertNotNull(resource);
 
@@ -94,7 +91,7 @@ public class CdoViewProviderProviderTest {
 
 		rs = null;
 		resource = null;
-		rs = cdoTestUtils.createAndPrepResourceSet(ImplCdoTestUtils.SCHEMA_JVM);
+		rs = cdoTestUtils.createAndPrepResourceSet(CdoTestUtils.SCHEMA_JVM);
 		resource = rs.getResource(uri, true);
 		Object object = resource.getContents().get(0);
 		assertTrue(object instanceof EObject);
