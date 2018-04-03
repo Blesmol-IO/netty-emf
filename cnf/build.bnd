@@ -30,6 +30,11 @@
 		url = http://download.eclipse.org/releases/oxygen/
 		#url = http://download.eclipse.org/eclipse/updates/4.7/R-4.7.3-201803010715/
 
+-plugin.6.NettyModelView: \
+	aQute.bnd.repository.p2.provider.P2Repository; \
+		name = NettyModelView; \
+		url = ${fileuri;${build}}/cache/p2-NettyModelView
+
 -releaserepo: Release
 -baselinerepo: Release
 

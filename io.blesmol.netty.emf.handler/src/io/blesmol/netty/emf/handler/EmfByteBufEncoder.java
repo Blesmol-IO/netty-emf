@@ -1,6 +1,6 @@
 package io.blesmol.netty.emf.handler;
 
-import io.blesmol.netty.emf.model.EByteBufHolder;
+import io.blesmol.netty.model.buffer.EByteBufHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

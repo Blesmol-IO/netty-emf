@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 
-import io.blesmol.netty.emf.model.EByteBufHolder;
-import io.blesmol.netty.emf.model.ModelFactory;
+import io.blesmol.netty.model.buffer.EByteBufHolder;
+import io.blesmol.netty.model.buffer.BufferFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
 
@@ -18,7 +18,7 @@ public class EmfByteBufEncoderTest {
 	public void shouldEncode() {
 		final byte[] expected = new String("This is a test.").getBytes(StandardCharsets.UTF_8);
 		
-		EByteBufHolder holder = ModelFactory.eINSTANCE.createEByteBufHolder();
+		EByteBufHolder holder = BufferFactory.eINSTANCE.createEByteBufHolder();
 		holder.setContents(expected);
 		
 		EmbeddedChannel channel = new EmbeddedChannel(new EmfByteBufEncoder());

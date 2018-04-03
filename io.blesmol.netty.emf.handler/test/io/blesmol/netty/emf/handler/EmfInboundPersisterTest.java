@@ -13,7 +13,7 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.junit.Test;
 
 import io.blesmol.emf.test.util.EmfTestUtils;
-import io.blesmol.netty.emf.model.EByteBufHolder;
+import io.blesmol.netty.model.buffer.EByteBufHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;

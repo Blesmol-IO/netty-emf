@@ -10,7 +10,7 @@
 	io.netty.common;version=4.1,\
 	io.netty.handler;version=4.1,\
 	io.netty.transport;version=4.1,\
-	io.blesmol.netty.emf.model;version=latest
+	io.blesmol.netty.model.buffer;version=latest
 
 -testpath: \
 	${junit},\

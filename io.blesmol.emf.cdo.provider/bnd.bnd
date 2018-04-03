@@ -42,6 +42,7 @@ h2: org.h2;version="[1.4.196,1.5)"
 	${junit},\
 	${mockito},\
 	${h2},\
+	slf4j.api;version=1.7,\
 	io.blesmol.emf.test;version=latest,\
 	io.blesmol.emf.cdo.test;version=latest
 
