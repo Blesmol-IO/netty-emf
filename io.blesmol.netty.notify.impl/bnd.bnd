@@ -1,0 +1,30 @@
+# This is the version of JUnit that will be used at build time and run time
+junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
+
+# This is the version of Mockito that will be used at build time and run time
+mockito: org.mockito.mockito-core;version="[2.1,3)",\
+  org.objenesis;version="[2.1,3)",\
+  net.bytebuddy.byte-buddy;version="[1.7.10,1.7.11)",\
+  net.bytebuddy.byte-buddy-agent;version="[1.7.10,1.7.11)"
+
+-buildpath: \
+	osgi.annotation; version=6.0.1,\
+	osgi.core; version=6.0,\
+	osgi.cmpn; version=6.0,\
+	slf4j.api;version=1.7,\
+	org.eclipse.emf.common;version=2.13,\
+	io.netty.buffer;version=4.1,\
+	io.netty.common;version=4.1,\
+	io.netty.transport;version=4.1
+
+-testpath: \
+	${junit},\
+	${mockito},\
+	slf4j.simple;version=1.7
+	
+
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Version: 0.1.0.${tstamp}
+Private-Package: io.blesmol.netty.notify.impl
