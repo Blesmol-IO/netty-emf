@@ -9,14 +9,17 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.DelegatingNotifyingListImpl;
 import org.eclipse.emf.common.util.EList;
 
+import io.blesmol.netty.notify.api.NotifyingServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
 // Make delegating?
-public class NotifyingServerBootstrapImpl extends DelegatingServerBootstrapImpl implements Notifier {
+public class NotifyingServerBootstrapImpl extends DelegatingServerBootstrapImpl implements NotifyingServerBootstrap {
 
 	public static final int SERVER_BOOTSTRAP__CHANNEL_FUTURES = 0;
-
+	
+	protected volatile String pid;
+	
 	protected final List<ChannelFuture> backedChannelFutures = new CopyOnWriteArrayList<>();
 	protected final Notifier delegatedNotifier = new AtomicNotifierImpl();
 
@@ -64,8 +67,9 @@ public class NotifyingServerBootstrapImpl extends DelegatingServerBootstrapImpl 
 		};
 	};
 
-	protected void activate() {
+	protected void activate(String pid) {
 		super.activate();
+		this.pid = pid;
 	}
 
 	protected void deactivate() {
@@ -100,4 +104,8 @@ public class NotifyingServerBootstrapImpl extends DelegatingServerBootstrapImpl 
 		return future;
 	}
 
+	@Override
+	public String getId() {
+		return pid;
+	}
 }
